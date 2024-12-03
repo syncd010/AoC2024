@@ -84,7 +84,10 @@ macro_rules! expand_days {
     };
 }
 
-expand_days!(1 => day1);
+expand_days!(1 => day1, 
+             2 => day2,
+             3 => day3
+            );
 
 fn main() {
     let args = env::args().collect::<Vec<String>>();

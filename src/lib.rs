@@ -3,5 +3,5 @@
 pub enum AoCResult {
     None,
     Str(String),
-    Int(u64),
+    Int(i64),
 }

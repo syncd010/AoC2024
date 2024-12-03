@@ -1,0 +1,28 @@
+use aoc2024::AoCResult;
+
+fn parse_input(input: &str) -> Vec<Vec<i32>> {
+    let vals = input
+        .lines()
+        .filter(|line| !line.is_empty())
+        .map(|line| {
+            line.split_whitespace()
+                .map(|v| v.parse().unwrap())
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+    vals
+}
+
+pub fn solve_part_one(input: &str) -> AoCResult {
+    let vals = parse_input(input);
+    let res = 0;
+
+    AoCResult::Int(res as i64)
+}
+
+pub fn solve_part_two(input: &str) -> AoCResult {
+    let vals = parse_input(input);
+    let res = 0;
+    
+    AoCResult::Int(res as i64)
+}
