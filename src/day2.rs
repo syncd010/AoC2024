@@ -52,12 +52,17 @@ pub fn solve_part_two(input: &str) -> AoCResult {
                 .unwrap_or(0);
 
             // Remove the first asc/desc sequence break or its successor and check if we get a valid levels
-            for idx in [asc_break_idx, asc_break_idx + 1, dsc_break_idx, dsc_break_idx + 1] {
+            for idx in [
+                asc_break_idx,
+                asc_break_idx + 1,
+                dsc_break_idx,
+                dsc_break_idx + 1,
+            ] {
                 let mut new_levels = levels.clone();
                 new_levels.remove(idx);
                 if valid_levels(&new_levels) {
                     return 1;
-                }    
+                }
             }
             return 0;
         })

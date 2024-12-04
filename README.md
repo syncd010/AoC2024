@@ -30,3 +30,8 @@ Part two was surprisingly twisted. The straightforward and inefficient  way to s
 
 ## [Day 3](https://adventofcode.com/2024/day/3)
 Straightforward enough, given that the work is mostly done via regular expressions.
+
+## [Day 4](https://adventofcode.com/2024/day/4)
+Transform the input into a 2d matrix of chars and for each position check if the search string is rooted there. On part one check for the string "XMAS" on each of the 8 possible directions, on part two, starting from the middle "A" check the corners to see if they contain the necessary "S" and "M".
+The twist on part two was quite clever.
+
