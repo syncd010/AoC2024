@@ -87,7 +87,8 @@ macro_rules! expand_days {
 expand_days!(1 => day1, 
              2 => day2,
              3 => day3,
-             4 => day4
+             4 => day4,
+             5 => day5
             );
 
 fn main() {
