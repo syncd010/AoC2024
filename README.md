@@ -66,3 +66,32 @@ Still straightforward, as long as one recognizes this as a sort problem. I assum
 
 **Part two solution:** Similarly assuming a total order defined by the input map, this part is just a sort using that order.
 
+
+## [Day 6](https://adventofcode.com/2024/day/6)
+This was one of those days were i started solving the problem with the wrong solution, which took some time to recognize and correct. During part two, i recognized that there was a need to store the visited positions and the corresponding directions, which led me to redo the whole day. For efficiency, to store the visited positions/directions a 1D array of integers is used, where each position is treated as a bitmask of the different directions that went through there.
+
+**Input parsing:** 2D matrix of characters.
+
+**Part one solution:** Simple walk through the map, marking the visited positions and corresponding directions.
+
+**Part two solution:** With the previous "walk through the map", place walls on the path, and repeat the walk, checking if a loop was found.
+
+
+## [Day 7](https://adventofcode.com/2024/day/7)
+Part two of this day is taking too long (about 600ms), so i must revisit this. The problem is that the number of possible combinations for the operations can be large, so i'm not seeing an easy way out
+
+**Input parsing:** Vector of tuples, each with the total and a vector of the other numbers.
+
+**Part one solution:** Place each operation on each of the available places, checking the total. The issue can be seen as looping through all numbers of base n that have p digits (n being the number of operations, p being the possible places for the operations), and for each digit apply a corresponding operation. Alternatively, generate the multi cartesian product of p iterators with n values and do the same as before.
+
+**Part two solution:** Same as part one, with a base of 3.
+
+
+## [Day 8](https://adventofcode.com/2024/day/8)
+Actually, for a Sunday, i was expecting more trouble. This wasn't too hard.
+
+**Input parsing:** Return the map as a 2d array of chars, and a hashmap with the locations for each antenna type.
+
+**Part one solution:** For each antenna type, generate all possible pair combinations. Then, for each pair check if the 2 positions placed on the line defined by the pair are within the grid.
+
+**Part two solution:** Similar to the previous one, except that we generate all positions defined by the pair line, which fit in the grid.
