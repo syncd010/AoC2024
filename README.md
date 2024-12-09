@@ -78,13 +78,13 @@ This was one of those days were i started solving the problem with the wrong sol
 
 
 ## [Day 7](https://adventofcode.com/2024/day/7)
-Part two of this day is taking too long (about 600ms), so i must revisit this. The problem is that the number of possible combinations for the operations can be large, so i'm not seeing an easy way out
+My first solution was kind of complex and inefficient, simplifying it led to much better runtimes.
 
 **Input parsing:** Vector of tuples, each with the total and a vector of the other numbers.
 
-**Part one solution:** Place each operation on each of the available places, checking the total. The issue can be seen as looping through all numbers of base n that have p digits (n being the number of operations, p being the possible places for the operations), and for each digit apply a corresponding operation. Alternatively, generate the multi cartesian product of p iterators with n values and do the same as before.
+**Part one solution:** Loop through each position, iteratively applying the various operations. Keep two stacks: the current one with the totals up until that position, and the next one, generated from applying the different operations to each of the values in the current stack. Maybe a recursive solution would be more readable, but this works too.
 
-**Part two solution:** Same as part one, with a base of 3.
+**Part two solution:** Same as part one, increasing the number of operations to 3.
 
 
 ## [Day 8](https://adventofcode.com/2024/day/8)
@@ -95,3 +95,13 @@ Actually, for a Sunday, i was expecting more trouble. This wasn't too hard.
 **Part one solution:** For each antenna type, generate all possible pair combinations. Then, for each pair check if the 2 positions placed on the line defined by the pair are within the grid.
 
 **Part two solution:** Similar to the previous one, except that we generate all positions defined by the pair line, which fit in the grid.
+
+
+## [Day 9](https://adventofcode.com/2024/day/9)
+A quick and dirty solution, with lots of imaginary pointers to keep track of stuff. I chose to not only use the input representation, but also an explicit memory representation, possible because it's about 100k values.
+
+**Input parsing:** The input as a vector of numbers and the corresponding memory representation, with the free spaces marked as -1.
+
+**Part one solution:** On the memory representation, keep 2 pointers, one from the start and one from the end. Copy from the end to the start when the start is an empty space and the end is an occupied space, until they pass each other.
+
+**Part two solution:** Trickier, as we need to use both representations, and an additional one to keep track of the moves that are made. Loop through the initial input representation from the end, trying to find space for each value on the moved input representation from the start. When enough space is found, update the moved input representation (updating the source and destination and their corresponding neighbors to account for the change in free space) as well as the memory representation.
