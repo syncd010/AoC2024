@@ -105,3 +105,13 @@ A quick and dirty solution, with lots of imaginary pointers to keep track of stu
 **Part one solution:** On the memory representation, keep 2 pointers, one from the start and one from the end. Copy from the end to the start when the start is an empty space and the end is an occupied space, until they pass each other.
 
 **Part two solution:** Trickier, as we need to use both representations, and an additional one to keep track of the moves that are made. Loop through the initial input representation from the end, trying to find space for each value on the moved input representation from the start. When enough space is found, update the moved input representation (updating the source and destination and their corresponding neighbors to account for the change in free space) as well as the memory representation.
+
+
+## [Day 10](https://adventofcode.com/2024/day/10)
+Very straightforward, a simple depth first search on the grid. I finally got tired of representing positions and directions as tuples, and created specific structures for them, simplifying the code.
+
+**Input parsing:** The input as a grid of numbers and a vector with the locations of the trailheads start.
+
+**Part one solution:** Do a depth first search from the starting points until a goal is reached. Store the unique goal location for part one and increase a counter of goal paths for part two.
+
+**Part two solution:** Done in part one.
