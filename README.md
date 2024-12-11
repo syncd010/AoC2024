@@ -115,3 +115,13 @@ Very straightforward, a simple depth first search on the grid. I finally got tir
 **Part one solution:** Do a depth first search from the starting points until a goal is reached. Store the unique goal location for part one and increase a counter of goal paths for part two.
 
 **Part two solution:** Done in part one.
+
+
+## [Day 11](https://adventofcode.com/2024/day/11)
+Took me more time than i care to admit to recognize that it wasn't necessary to "blink" each value individually, that it was possible to keep a count of the different values and just evolve those counts...
+
+**Input parsing:** An hashmap with the count of the different values that appear on the input.
+
+**Part one solution:** Evolve each value according to the rules, creating a new Hashmap with the evolved values and the old counts.
+
+**Part two solution:** Similar to part one.
