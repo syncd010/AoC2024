@@ -125,3 +125,13 @@ Took me more time than i care to admit to recognize that it wasn't necessary to 
 **Part one solution:** Evolve each value according to the rules, creating a new Hashmap with the evolved values and the old counts.
 
 **Part two solution:** Similar to part one.
+
+
+## [Day 12](https://adventofcode.com/2024/day/12)
+Getting part two took right some time, but in the end it's similar to part one, just adjusting the calculation to subtract the common sides for the neighbors.
+
+**Input parsing:** Just separate the chars.
+
+**Part one solution:** For each position of the grid that hasn't been explored do a flood calculating the area and perimeter of the region. The perimeter is calculated by storing, for each position a bitmask where a bit is set for each direction that is "outside" the region.
+
+**Part two solution:** Similar to part one, but to correctly calculate the perimeter, subtract the common sides that are outside for the each of the neighbors.

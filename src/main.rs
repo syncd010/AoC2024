@@ -94,7 +94,8 @@ expand_days!(1 => day1,
              8 => day8,
              9 => day9,
              10 => day10,
-             11 => day11
+             11 => day11,
+             12 => day12
             );
 
 fn main() {

@@ -24,7 +24,7 @@ impl Pos {
         ((by.x < 0 && self.x >= by.x.abs() as usize)
             || (by.x >= 0 && self.x + (by.x as usize) < dim.x))
             && ((by.y < 0 && self.y >= by.y.abs() as usize)
-                || (by.y >= 0 && self.y + (by.y as usize) < dim.x))
+                || (by.y >= 0 && self.y + (by.y as usize) < dim.y))
     }
 }
 
