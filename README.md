@@ -135,3 +135,13 @@ Getting part two took right some time, but in the end it's similar to part one, 
 **Part one solution:** For each position of the grid that hasn't been explored do a flood calculating the area and perimeter of the region. The perimeter is calculated by storing, for each position a bitmask where a bit is set for each direction that is "outside" the region.
 
 **Part two solution:** Similar to part one, but to correctly calculate the perimeter, subtract the common sides that are outside for the each of the neighbors.
+
+
+## [Day 13](https://adventofcode.com/2024/day/13)
+It's a simple system of linear equations, directly solver through linear algebra. With numpy this would be a lot faster, as is, and because i don't want to use external crates, i implemented the necessary operations to calculate determinant, dot product and inverse 2x2 matrices.
+
+**Input parsing:** For each "machine" returns the prize vector and the corresponding matrix.
+
+**Part one solution:** Solve aX=b => a = dot(b, inv(X)), where b is the prize vector and X the other matrix. Afterwards, only consider solutions that are integers.
+
+**Part two solution:** Same as part one.
