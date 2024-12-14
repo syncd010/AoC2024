@@ -145,3 +145,13 @@ It's a simple system of linear equations, directly solver through linear algebra
 **Part one solution:** Solve aX=b => a = dot(b, inv(X)), where b is the prize vector and X the other matrix. Afterwards, only consider solutions that are integers.
 
 **Part two solution:** Same as part one.
+
+
+## [Day 14](https://adventofcode.com/2024/day/14)
+Interesting day. Part two was underspecified, which let me somehow unsure on how to proceed. Manually visualizing the grid evolution to spot a tree sounded like a dead end, but there was no specific conditions to identify the tree. At first i thought that it could be assumed to be a full tree, so all robots would be together, but then i noticed the "most robost" on the description which invalidated that. Nevertheless, to form a tree, most of the robots would have to be close together... positions close together can be efficiently identified by finding the minimum variance on each axis, which sounds like a plan. There still was the question of how many steps to consider to identify the minimum variance but, noticing that this is modular arithmetic after all, there's a repetition period, which can be at most the width/height of the grid. So assuming that the period on each axis is at most its length, one can identify the time step with the minimum variance in that period, then use the chinese remainder theorem to calculate when the two axis will both have minimum variance.
+
+**Input parsing:** For each line, its corresponding position and direction.
+
+**Part one solution:** Straightforward modular arithmetic to calculate the positions of the robots.
+
+**Part two solution:** Explained before. To calculate the minimum chinese theorem, i took the easy way out, doing a systematic search on the possible time steps instead of searching by seaving (which i did in AoC 2020).
