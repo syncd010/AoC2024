@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign};
+use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 #[derive(Debug)]
 pub enum AoCResult {
@@ -64,6 +64,47 @@ impl AddAssign<Dir> for Pos {
         *self = Self {
             x: (self.x as isize + dir.x) as usize,
             y: (self.y as isize + dir.y) as usize,
+        };
+    }
+}
+
+
+impl Sub for Pos {
+    type Output = Pos;
+
+    fn sub(self, other: Pos) -> Pos {
+        Pos {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        }
+    }
+}
+
+impl Sub<Dir> for Pos {
+    type Output = Pos;
+
+    fn sub(self, dir: Dir) -> Pos {
+        Pos {
+            x: (self.x as isize - dir.x) as usize,
+            y: (self.y as isize - dir.y) as usize,
+        }
+    }
+}
+
+impl SubAssign for Pos {
+    fn sub_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        };
+    }
+}
+
+impl SubAssign<Dir> for Pos {
+    fn sub_assign(&mut self, dir: Dir) {
+        *self = Self {
+            x: (self.x as isize - dir.x) as usize,
+            y: (self.y as isize - dir.y) as usize,
         };
     }
 }

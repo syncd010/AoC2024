@@ -155,3 +155,13 @@ Interesting day. Part two was underspecified, which let me somehow unsure on how
 **Part one solution:** Straightforward modular arithmetic to calculate the positions of the robots.
 
 **Part two solution:** Explained before. To calculate the minimum chinese theorem, i took the easy way out, doing a systematic search on the possible time steps instead of searching by seaving (which i did in AoC 2020).
+
+
+## [Day 15](https://adventofcode.com/2024/day/15)
+Fun day. Theoretically it's straightforward, but in practice, part two took some time to get all the kinks worked out.
+
+**Input parsing:** Returns the grid and the list of directions.
+
+**Part one solution:** For each direction and from the current position, walk the grid until an empty space is found. If one is found, walk back to the starting position, moving each cell.
+
+**Part two solution:** The strategy is to get all the connected cells, starting from a position and in a given direction. If it's not possible to move (found a wall), return `None`. Given that, iterate through the directions, moving all connected cells. To move, and for performance reasons, use an auxiliary scratchpad, where the contents of the cells to be moved are written, then clear those cells from the grid and copy from the scratchpad to the new positions.
