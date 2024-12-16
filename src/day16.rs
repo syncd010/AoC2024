@@ -1,7 +1,7 @@
 use aoc2024::*;
-use std::rc::Rc;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashSet};
+use std::rc::Rc;
 use std::vec;
 
 fn parse_input(input: &str) -> Vec<Vec<char>> {
@@ -88,28 +88,34 @@ fn dijkstra(start: State, grid: &[Vec<char>]) -> Vec<Rc<State>> {
     let mut min_goal_cost = u64::MAX;
     let mut goals_found = Vec::new();
 
+    // Uniform cost search
     while let Some(current) = frontier.pop() {
         if current.cost > min_goal_cost {
+            // Already found all goals with minimum cost
             break;
         }
         if current.cost > reached[current.pos.y][current.pos.x][dir_idx(current.dir)] {
+            // Already visited this node with less cost
             continue;
         }
-        // Goal?
         if grid[current.pos.y][current.pos.x] == 'E' {
+            // Node is goal, save
             min_goal_cost = current.cost;
             goals_found.push(current);
             continue;
         }
         for next in successors(current, &grid) {
+            // Process successors
             let prev_cost = &mut reached[next.pos.y][next.pos.x][dir_idx(next.dir)];
             if next.cost > *prev_cost {
+                // Already visited this node with less cost
                 continue;
             }
             *prev_cost = next.cost;
             frontier.push(Rc::new(next));
         }
     }
+    // Filter goals with the minimum cost found.
     goals_found
         .iter()
         .filter(|&rc| rc.cost == min_goal_cost)
@@ -117,21 +123,7 @@ fn dijkstra(start: State, grid: &[Vec<char>]) -> Vec<Rc<State>> {
         .collect::<Vec<_>>()
 }
 
-pub fn solve_part_one(input: &str) -> AoCResult {
-    let grid = parse_input(input);
-    let start = State {
-        pos: find_in_grid(&grid, 'S'),
-        dir: Dir { y: 0, x: 1 },
-        cost: 0,
-        prev: None,
-    };
-
-    let paths = &dijkstra(start, &grid);
-    let res = paths[0].cost;
-    AoCResult::Int(res as i64)
-}
-
-pub fn solve_part_two(input: &str) -> AoCResult {
+fn solve(input: &str) -> (u64, u64) {
     let grid = parse_input(input);
     let start = State {
         pos: find_in_grid(&grid, 'S'),
@@ -142,14 +134,42 @@ pub fn solve_part_two(input: &str) -> AoCResult {
 
     let paths = &dijkstra(start, &grid);
     let mut unique_pos = HashSet::new();
-    for path in paths {
+    // Reconstruct path
+    for mut path in paths {
         unique_pos.insert(path.pos);
-        let mut p = path.prev.as_ref();
-        while p != None {
-            unique_pos.insert(p.unwrap().pos);
-            p = p.unwrap().prev.as_ref();
+
+        while let Some(p) = path.prev.as_ref() {
+            unique_pos.insert(p.pos);
+            path = path.prev.as_ref().unwrap();
         }
     }
-    let res = unique_pos.len();
-    AoCResult::Int(res as i64)
+
+    (paths[0].cost, unique_pos.len() as u64)
+}
+
+use std::cell::Cell;
+thread_local! { static SOLUTION: Cell<Option<(u64, u64)>> = Cell::new(None); }
+
+pub fn solve_part_one(input: &str) -> AoCResult {
+    // Solve both parts and store
+    SOLUTION.with(|sol_cell| {
+        let mut sol = sol_cell.get();
+        if sol.is_none() {
+            sol = Some(solve(input));
+            sol_cell.set(sol);
+        }
+        AoCResult::Int(sol.unwrap().0 as i64)
+    })
+}
+
+pub fn solve_part_two(input: &str) -> AoCResult {
+    // Solve both parts and store
+    SOLUTION.with(|sol_cell| {
+        let mut sol = sol_cell.get();
+        if sol.is_none() {
+            sol = Some(solve(input));
+            sol_cell.set(sol);
+        }
+        AoCResult::Int(sol.unwrap().1 as i64)
+    })
 }
