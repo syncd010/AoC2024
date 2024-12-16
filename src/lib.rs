@@ -7,13 +7,13 @@ pub enum AoCResult {
     Int(i64),
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Pos {
     pub x: usize,
     pub y: usize,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Dir {
     pub x: isize,
     pub y: isize,
@@ -68,7 +68,6 @@ impl AddAssign<Dir> for Pos {
     }
 }
 
-
 impl Sub for Pos {
     type Output = Pos;
 
@@ -106,5 +105,25 @@ impl SubAssign<Dir> for Pos {
             x: (self.x as isize - dir.x) as usize,
             y: (self.y as isize - dir.y) as usize,
         };
+    }
+}
+
+pub enum Rotation {
+    Clockwise,
+    CounterClockwise,
+}
+
+impl Dir {
+    pub fn rotate(&self, towards: Rotation) -> Dir {
+        match towards {
+            Rotation::Clockwise => Dir {
+                y: self.x,
+                x: self.y * -1,
+            },
+            Rotation::CounterClockwise => Dir {
+                y: self.x * -1,
+                x: self.y,
+            },
+        }
     }
 }

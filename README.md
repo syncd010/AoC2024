@@ -165,3 +165,14 @@ Fun day. Theoretically it's straightforward, but in practice, part two took some
 **Part one solution:** For each direction and from the current position, walk the grid until an empty space is found. If one is found, walk back to the starting position, moving each cell.
 
 **Part two solution:** The strategy is to get all the connected cells, starting from a position and in a given direction. If it's not possible to move (found a wall), return `None`. Given that, iterate through the directions, moving all connected cells. To move, and for performance reasons, use an auxiliary scratchpad, where the contents of the cells to be moved are written, then clear those cells from the grid and copy from the scratchpad to the new positions.
+
+
+## [Day 16](https://adventofcode.com/2024/day/16)
+Yet another Dijkstra search. This one is almost identical to last year's day 17, so i just copied the solution, translating it from C++ to Rust. Couldn't use a bucket queue because the indices would be sparsely populated, so i used the traditional priority queue.
+Furthermore, had to use Rc for part two, to keep track of the followed path, which led to some struggle with Rust...
+
+**Input parsing:** The grid.
+
+**Part one solution:** Dijkstra search.
+
+**Part two solution:** Dijkstra search, keeping all the paths that lead to the goal, and returning unique positions.
