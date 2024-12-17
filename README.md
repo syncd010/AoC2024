@@ -176,3 +176,18 @@ Furthermore, had to use Rc for part two, to keep track of the followed path, whi
 **Part one solution:** Dijkstra search.
 
 **Part two solution:** Dijkstra search, keeping all the paths that lead to the goal, and returning unique positions.
+
+
+
+## [Day 17](https://adventofcode.com/2024/day/17)
+I have a love/hate relationship with these kinds of problems. On one hand i like writing interpreters, on the other i hate interpreting low level code, but when i "see" it, it's a good feeling... Anyway one more done, with a lot of wasted time.
+
+**Input parsing:** The register contents and the program.
+
+**Part one solution:** Simple interpreter, not much to say.
+
+**Part two solution:** I initially tried to decode the instructions and rewrite them in Rust, but after a minute or so of runtime, i realized this wasn't the way. Looking at the program, and after a long time, i noticed that the solution can be had recursively, looping through the end:
+- A is shifted 3 bits to the right (A / 8) at each digit generation;
+- After generating the last digit, A must be 0, so, before generating the last digit A must be between 0 and 8;
+- Working backwards, at each step we need only to check 8 values and see if they generate the digit being considered.
+Notice that there can be more than one solution at each step, and that each one must be kept and carried to try to generate the previous digit. In the end the minimum is calculated and returned.
