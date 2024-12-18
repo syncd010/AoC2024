@@ -148,7 +148,7 @@ It's a simple system of linear equations, directly solver through linear algebra
 
 
 ## [Day 14](https://adventofcode.com/2024/day/14)
-Interesting day. Part two was underspecified, which let me somehow unsure on how to proceed. Manually visualizing the grid evolution to spot a tree sounded like a dead end, but there was no specific conditions to identify the tree. At first i thought that it could be assumed to be a full tree, so all robots would be together, but then i noticed the "most robost" on the description which invalidated that. Nevertheless, to form a tree, most of the robots would have to be close together... positions close together can be efficiently identified by finding the minimum variance on each axis, which sounds like a plan. There still was the question of how many steps to consider to identify the minimum variance but, noticing that this is modular arithmetic after all, there's a repetition period, which can be at most the width/height of the grid. So assuming that the period on each axis is at most its length, one can identify the time step with the minimum variance in that period, then use the chinese remainder theorem to calculate when the two axis will both have minimum variance.
+Interesting day. Part two was underspecified, which let me somehow unsure on how to proceed. Manually visualizing the grid evolution to spot a tree sounded like a dead end, but there was no specific conditions to identify the tree. At first i thought that it could be assumed to be a full tree, so all robots would be together, but then i noticed the "most robots" on the description which invalidated that. Nevertheless, to form a tree, most of the robots would have to be close together... positions close together can be efficiently identified by finding the minimum variance on each axis, which sounds like a plan. There still was the question of how many steps to consider to identify the minimum variance but, noticing that this is modular arithmetic after all, there's a repetition period, which can be at most the width/height of the grid. So assuming that the period on each axis is at most its length, one can identify the time step with the minimum variance in that period, then use the chinese remainder theorem to calculate when the two axis will both have minimum variance.
 
 **Input parsing:** For each line, its corresponding position and direction.
 
@@ -186,8 +186,21 @@ I have a love/hate relationship with these kinds of problems. On one hand i like
 
 **Part one solution:** Simple interpreter, not much to say.
 
-**Part two solution:** I initially tried to decode the instructions and rewrite them in Rust, but after a minute or so of runtime, i realized this wasn't the way. Looking at the program, and after a long time, i noticed that the solution can be had recursively, looping through the end:
-- A is shifted 3 bits to the right (A / 8) at each digit generation;
-- After generating the last digit, A must be 0, so, before generating the last digit A must be between 0 and 8;
-- Working backwards, at each step we need only to check 8 values and see if they generate the digit being considered.
-Notice that there can be more than one solution at each step, and that each one must be kept and carried to try to generate the previous digit. In the end the minimum is calculated and returned.
+**Part two solution:** I initially tried to decode the instructions and rewrite them in Rust, but after a minute or so of runtime, i realized this wasn't the way. Looking at the program, and after a long time, i noticed the following regarding the instructions:
+- Each loop outputs a digit;
+- It only depends on the A register value;
+- At the end of each loop A is divided by 8 (shifted 3 bits to the right), so at the beginning of the loop A can be at most in a range of [end..end+8[;
+- After generating the last digit, A must be 0;
+Therefore, the solution can be constructed recursively, working backwards from the last digit to the first:
+- Test each of the values [A..A+8[, to see which one outputs the pretended digit at that position. Save that possible solution, and recurse to the previous digit;
+- There can be more than one solution at each step, and that each one must be kept and carried to try to generate the previous digit. In the end the minimum is calculated and returned.
+
+
+## [Day 18](https://adventofcode.com/2024/day/19)
+Easy enough, a straightforward BFS. Reading the description i got the impression that, in part two, the order of the "falling" bytes would be relevant, so i chose to store in each grid position not a simple occupied/free indicator but the time index that that position becomes occupied. This come indeed handy in part two, particularly for performance reasons, because there's no need to regenerate the grid in each step.
+
+**Input parsing:** The positions.
+
+**Part one solution:** Simple BFS, only considering the positions that are under the time limit.
+
+**Part two solution:** With the grid structure, this is also relatively straightforward: define a time limit and verify if there's a path using the BFS. To find the time limit i used a simple binary search, given that iteratively searching for it was taking about 1s, and with a binary search it takes less than 1ms.
