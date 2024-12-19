@@ -196,7 +196,7 @@ Therefore, the solution can be constructed recursively, working backwards from t
 - There can be more than one solution at each step, and that each one must be kept and carried to try to generate the previous digit. In the end the minimum is calculated and returned.
 
 
-## [Day 18](https://adventofcode.com/2024/day/19)
+## [Day 18](https://adventofcode.com/2024/day/18)
 Easy enough, a straightforward BFS. Reading the description i got the impression that, in part two, the order of the "falling" bytes would be relevant, so i chose to store in each grid position not a simple occupied/free indicator but the time index that that position becomes occupied. This come indeed handy in part two, particularly for performance reasons, because there's no need to regenerate the grid in each step.
 
 **Input parsing:** The positions.
@@ -204,3 +204,14 @@ Easy enough, a straightforward BFS. Reading the description i got the impression
 **Part one solution:** Simple BFS, only considering the positions that are under the time limit.
 
 **Part two solution:** With the grid structure, this is also relatively straightforward: define a time limit and verify if there's a path using the BFS. To find the time limit i used a simple binary search, given that iteratively searching for it was taking about 1s, and with a binary search it takes less than 1ms.
+
+
+## [Day 19](https://adventofcode.com/2024/day/19)
+Nice twist on part two. Part one was relatively straightforward, I chose to just keep track of the reached indexes on the design, and not all the possible pattern combinations to do that, which helped with performance. Looking at part two, i though that just by changing 3 or 4 lines of the solution i had would be enough, which indeed was, but only with the test input... On the real input it didn't seem to want to end, so i had to get back to the drawing board and create a different solution.
+
+
+**Input parsing:** The patterns present on the first line and the designs on the other lines, both as vector of vector of chars.
+
+**Part one solution:** For each design, keep a list of the reached indexes up until that point, and try to fit each of the patterns from that index on. If the pattern fits and the end of the design is reached, break and increase the solution counter, otherwise, update the list of reached indexes with the pattern length.
+
+**Part two solution:** For each design keep a count of the number of paths that have reached each of the design's indexes. Iterate through the design's length, trying to fit each pattern, and updating the reached indexes count. The solution is the count on the last position.
