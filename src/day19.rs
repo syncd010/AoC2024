@@ -1,32 +1,29 @@
 use aoc2024::AoCResult;
+use itertools::Itertools;
 
-fn parse_input(input: &str) -> (Vec<Vec<char>>, Vec<Vec<char>>) {
-    let mut patterns = None;
-    let mut designs = Vec::new();
-    for line in input.lines() {
-        if line.is_empty() {
-            continue;
-        }
-        if patterns.is_none() {
-            patterns = Some(
-                line.split(", ")
-                    .map(|p| p.chars().collect())
-                    .collect::<Vec<_>>(),
-            );
-        } else {
-            designs.push(line.chars().collect());
-        }
-    }
-
-    (patterns.unwrap(), designs)
+fn parse_input(input: &str) -> (Vec<&str>, Vec<&str>) {
+    let (patterns, designs) = input.split_once("\n\n").unwrap();
+    (
+        patterns.split(", ").collect_vec(),
+        designs.split("\n").collect_vec(),
+    )
 }
 
-fn pattern_fits(pattern: &[char], design: &[char]) -> bool {
-    pattern
-        .iter()
-        .enumerate()
-        .all(|(i, c)| i < design.len() && *c == design[i])
-}
+// fn possible_combinations<'a>(design: &'a str, patterns: &Vec<&str>, memo: &mut HashMap<&'a str, u64>) -> u64 {
+//     if design.len() == 0 {
+//         1
+//     } else if let Some(count) = memo.get(design) {
+//         *count
+//     } else {
+//         let res = patterns
+//             .iter()
+//             .filter(|pat| design.starts_with(*pat))
+//             .map(|pat| possible_combinations(&design[pat.len()..], patterns, memo))
+//             .sum();
+//         memo.entry(design).and_modify(|c| *c = res).or_insert(res);
+//         res
+//     }
+// }
 
 pub fn solve_part_one(input: &str) -> AoCResult {
     let (patterns, designs) = parse_input(input);
@@ -37,7 +34,7 @@ pub fn solve_part_one(input: &str) -> AoCResult {
         let mut design_is_possible = false;
         while let Some(idx) = reached_idxs.pop() {
             for pat in &patterns {
-                if pattern_fits(pat, &design[idx..]) {
+                if design[idx..].starts_with(pat) {
                     let new_idx = idx + pat.len();
                     if new_idx == design.len() {
                         design_is_possible = true;
@@ -66,7 +63,7 @@ pub fn solve_part_two(input: &str) -> AoCResult {
         paths_to_idx[0] = 1;
         for idx in 0..design.len() {
             for pat in &patterns {
-                if pattern_fits(pat, &design[idx..]) {
+                if design[idx..].starts_with(pat) {
                     let new_idx = idx + pat.len();
                     paths_to_idx[new_idx] += paths_to_idx[idx];
                 }
