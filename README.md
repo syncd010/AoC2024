@@ -215,3 +215,16 @@ Nice twist on part two. Part one was relatively straightforward, I chose to just
 **Part one solution:** For each design, keep a list of the reached indexes up until that point, and try to fit each of the patterns from that index on. If the pattern fits and the end of the design is reached, break and increase the solution counter, otherwise, update the list of reached indexes with the pattern length.
 
 **Part two solution:** For each design keep a count of the number of paths that have reached each of the design's indexes. Iterate through the design's length, trying to fit each pattern, and updating the reached indexes count. The solution is the count on the last position.
+
+
+
+## [Day 20](https://adventofcode.com/2024/day/20)
+Getting to a solution was easy and quick enough. Build a path on the maze, saving the corresponding positions. Then iterate through the combinations of those positions and for each pair check if their manhattan distance is less than the max cheat distance, and if the saved time (which is tha path length between the positions minus their manhattan distance) is bigger than what is intended.
+This was straightforward but took tens of milliseconds to run, so i looked for some optimizations. For now, what i come up with is build a second grid with the path marked.
+Need revisiting
+
+**Input parsing:** The grid.
+
+**Part one solution:** Described earlier.
+
+**Part two solution:** Described earlier.
