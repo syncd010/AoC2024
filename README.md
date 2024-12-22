@@ -228,3 +228,24 @@ Need revisiting
 **Part one solution:** Described earlier.
 
 **Part two solution:** Described earlier.
+
+
+## [Day 21](https://adventofcode.com/2024/day/21)
+WIP
+
+**Input parsing:** Input lines.
+
+**Part one solution:** 
+
+**Part two solution:** 
+
+
+## [Day 22](https://adventofcode.com/2024/day/22)
+After yesterday, this was a breeze. The description is confusing, but the intent is straightforward.
+Still tried to optimize the runtime by using bitwise operations instead of arithmetic and tuples, but it's still not enough. Need to take a second look.
+
+**Input parsing:** Input numbers.
+
+**Part one solution:** Some bit manipulations and sum the result.
+
+**Part two solution:** Main issue here is that, for each monkey, we need to store only the first difference that appears, otherwise this would be cleaner.

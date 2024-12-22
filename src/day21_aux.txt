@@ -1,0 +1,51 @@
+    +---+---+
+    | ^ | A |
++---+---+---+
+| < | v | > |
++---+---+---+
+
+
+A ^ : < A
+A > : v A
+A v : v < A  |  < v A
+A < : v < < A  |  < v < A
+A A : A
+
+^ A : > A
+^ v : v A
+^ < : v < A
+^ > : v > A  |  > v A
+^ ^ : A
+
+> A : ^ A
+> v : < A
+> < : < < A
+> ^ : < ^ A  |  ^ < A
+> > : A
+
+v < : < A
+v > : > A
+v ^ : ^ A
+v A : ^ > A  |  > ^ A
+v v : A
+
+< v : > A
+< > : > > A
+< ^ : > ^ A
+< A : > > ^ A  |  > ^ > A
+< < : A
+
+
+A                                                 v
+A                 v               <               A
+A     v   <       A       <       A   > >     ^   A 
+A v < A < A > > ^ A v < < A > > ^ A v A A ^ < A > A
+
+
+A                                         v
+A                   <       v             A
+A     v   < <       A   >   A   >     ^   A
+A < v A < A A > > ^ A v A ^ A v A ^ < A > A
+
+
+
