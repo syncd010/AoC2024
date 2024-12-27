@@ -1,24 +1,12 @@
-#![allow(unused)]
+use aoc2024::*;
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 
-use aoc2024::*;
-
-
 fn parse_input(input: &str) -> Vec<&str> {
-    input
-        .lines()
-        .filter(|line| !line.is_empty())
-        .collect::<Vec<_>>()
+    input.lines().filter(|line| !line.is_empty()).collect_vec()
 }
 
-fn pos_diff(p1: &Pos, p2: &Pos) -> Dir {
-    Dir {
-        x: p1.x as isize - p2.x as isize,
-        y: p1.y as isize - p2.y as isize,
-    }
-}
-
-fn dir_to_keypresses(dir: &Dir) -> String {
+fn dir_to_moves(dir: &Dir) -> String {
     let horiz = match dir.x.signum() {
         -1 => "<".repeat(dir.x.abs() as usize),
         1 => ">".repeat(dir.x.abs() as usize),
@@ -32,196 +20,198 @@ fn dir_to_keypresses(dir: &Dir) -> String {
     horiz + &vert
 }
 
-fn iter_combs(v: String) -> HashSet<String> {
-    let len = v.len();
-    let mut res = HashSet::new();
-    if len == 0 {
-        res.insert(v);
+fn char_combinations(v: String) -> HashSet<String> {
+    if v.len() == 0 {
+        HashSet::from([v])
     } else {
-        for i_start in 0..len {
-            res.insert(format!("{}{}", &v[i_start..], &v[0..i_start]));
-        }
+        (0..v.len())
+            .map(|i| format!("{}{}", &v[i..], &v[0..i]))
+            .collect()
     }
-    res
 }
 
-fn keypresses(keypad: &HashMap<char, Pos>, start_pos: Pos, code: &str) -> Vec<String> {
+// Expands the code by simulating moving through the given keypad
+fn keypad_sim(
+    keypad: &HashMap<char, Dir>,
+    keypad_inv: &HashMap<Dir, char>,
+    start_pos: Dir,
+    code: &str,
+) -> Vec<String> {
     if let Some(c) = code.chars().next() {
-        let keypad_pos = keypad.get(&c).expect("Couldn't get keypad position");
-        let moves = pos_diff(keypad_pos, &start_pos);
-
-        let keypad_inverted: HashMap<&Pos, &char> = keypad.iter().map(|(k, v)| (v, k)).collect();
-        let possible_keypresses = iter_combs(dir_to_keypresses(&moves));
-
-        let a = possible_keypresses.iter().filter(|&v| {
-            // Filter for keypresses that go through the black hole in the keypad
-            let mut p = start_pos;
-            for c in v.chars() {
-                match c {
-                    '<' => p.x -= 1,
-                    '>' => p.x += 1,
-                    '^' => p.y -= 1,
-                    'v' => p.y += 1,
-                    _ => panic!("Unexpected direction"),
-                }
-                if !keypad_inverted.contains_key(&p) {
-                    return false;
-                }
-            }
-            true
-        });
-        let b = a.flat_map(|head| {
-            // Recurse to get keypresses for the following chars
-            keypresses(keypad, *keypad_pos, &code[1..])
-                .iter()
-                .map(|tail| head.to_owned() + "A" + tail)
-                .collect::<Vec<_>>()
-        });
-        b.collect()
+        // Expand going from start_pos to the first char position on the keypad
+        let &keypad_pos = keypad.get(&c).expect("Couldn't get keypad position");
+        let moves = keypad_pos - start_pos;
+        // possible_moves contains all combinations of moves to the destination
+        let possible_moves = char_combinations(dir_to_moves(&moves));
+        possible_moves
+            .iter()
+            .filter(|&v| {
+                // Filter for moves that go through the black hole in the keypad
+                let mut p = start_pos;
+                v.chars().all(|c| {
+                    match c {
+                        '<' => p.x -= 1,
+                        '>' => p.x += 1,
+                        '^' => p.y -= 1,
+                        _ => p.y += 1,
+                    }
+                    keypad_inv.contains_key(&p)
+                })
+            })
+            .flat_map(|head| {
+                // Recurse to get moves for the following chars
+                keypad_sim(keypad, keypad_inv, keypad_pos, &code[1..])
+                    .iter()
+                    .map(|tail| head.to_owned() + "A" + tail)
+                    .collect_vec()
+            })
+            .collect()
     } else {
         vec![String::new()]
     }
 }
 
-// fn keypresses_rec(single_step: &str, depth: u8, n_map: &HashMap<&str, Vec<&str>>) -> usize {
-//     if depth == 0 {
-//         single_step.len() - 1
-//     } else {
-//         let next_step = n_map.get(single_step).expect("Couldn't find step in map");
-//         let mut min_len = usize::MAX;
-//         for &step_branch in next_step {
-//             let mut total_len = 0;
-//             for i in 0..step_branch.len() - 1 {
-//                 total_len += keypresses_rec(&step_branch[i..i + 2], depth - 1, n_map);
-//             }
-//             min_len = min_len.min(total_len + 1);
-//         }
-//         min_len
-//     }
+// Expands a single move recursively, up to the specified depth
+// Returns the length of the minimum expansion found
+fn expand_rec<'a>(
+    single_move: &'a str,
+    depth: u8,
+    expansion_map: &HashMap<&'a str, Vec<&'a str>>,
+    memo: &mut HashMap<(&'a str, u8), usize>,
+) -> usize {
+    // Already memoized?
+    let memo_key = (single_move, depth);
+    if memo.contains_key(&memo_key) {
+        return memo[&memo_key];
+    }
+
+    // Expand
+    let expansions = expansion_map
+        .get(single_move)
+        .expect("Couldn't find step in map");
+    let mut min_expansion = usize::MAX;
+
+    if depth == 1 {
+        // Reached the bottom, directly return the minimum expansion length found
+        min_expansion = expansions
+            .iter()
+            .reduce(|acc, s| if acc.len() < s.len() { acc } else { s })
+            .unwrap()
+            .len()
+            - 1;
+    } else {
+        // Expand each of the possibilities, keeping the shortest one
+        for &expansion in expansions {
+            let mut expanded = 0;
+            // Loop through the characters of the expansion on this level, recursively expanding a single one
+            for i in 0..expansion.len() - 1 {
+                expanded += expand_rec(&expansion[i..i + 2], depth - 1, expansion_map, memo);
+            }
+            min_expansion = min_expansion.min(expanded);
+        }
+    }
+    // memoize
+    memo.insert(memo_key, min_expansion);
+    min_expansion
+}
+
+// Returns the minimum length of the expansion of moves to the specified depth
+fn expand_moves(moves: &str, depth: u8) -> usize {
+    // The expansion of each possible move through the keypad, including the initial "A"
+    let expansion_map: HashMap<&str, Vec<&str>> = HashMap::from([
+        ("A^", vec!["A<A"]),
+        ("A>", vec!["AvA"]),
+        ("Av", vec!["Av<A", "A<vA"]),
+        ("A<", vec!["Av<<A", "A<v<A"]),
+        ("AA", vec!["AA"]),
+        ("^A", vec!["A>A"]),
+        ("^v", vec!["AvA"]),
+        ("^<", vec!["Av<A"]),
+        ("^>", vec!["Av>A", "A>vA"]),
+        ("^^", vec!["AA"]),
+        (">A", vec!["A^A"]),
+        (">v", vec!["A<A"]),
+        ("><", vec!["A<<A"]),
+        (">^", vec!["A<^A", "A^<A"]),
+        (">>", vec!["AA"]),
+        ("v<", vec!["A<A"]),
+        ("v>", vec!["A>A"]),
+        ("v^", vec!["A^A"]),
+        ("vA", vec!["A^>A", "A>^A"]),
+        ("vv", vec!["AA"]),
+        ("<v", vec!["A>A"]),
+        ("<>", vec!["A>>A"]),
+        ("<^", vec!["A>^A"]),
+        ("<A", vec!["A>>^A", "A>^>A"]),
+        ("<<", vec!["AA"]),
+    ]);
+
+    let mut memo = HashMap::new();
+    let moves = &format!("A{}", moves);
+    let mut expanded_len = 0;
+    for i in 0..moves.len() - 1 {
+        expanded_len += expand_rec(&moves[i..i + 2], depth, &expansion_map, &mut memo);
+    }
+    expanded_len
+}
+
+// Returns the numeric keypad and its inversion
+fn num_keypads() -> (HashMap<char, Dir>, HashMap<Dir, char>) {
+    let keypad = HashMap::from([
+        ('7', Dir { y: 0, x: 0 }),
+        ('8', Dir { y: 0, x: 1 }),
+        ('9', Dir { y: 0, x: 2 }),
+        ('4', Dir { y: 1, x: 0 }),
+        ('5', Dir { y: 1, x: 1 }),
+        ('6', Dir { y: 1, x: 2 }),
+        ('1', Dir { y: 2, x: 0 }),
+        ('2', Dir { y: 2, x: 1 }),
+        ('3', Dir { y: 2, x: 2 }),
+        ('0', Dir { y: 3, x: 1 }),
+        ('A', Dir { y: 3, x: 2 }),
+    ]);
+    let keypad_inverted = keypad.iter().map(|(&k, &v)| (v, k)).collect();
+    (keypad, keypad_inverted)
+}
+
+// fn dir_keypads() -> (HashMap<char, Dir>, HashMap<Dir, char>) {
+//     let keypad = HashMap::from([
+//         ('^', Dir { y: 0, x: 1 }),
+//         ('A', Dir { y: 0, x: 2 }),
+//         ('<', Dir { y: 1, x: 0 }),
+//         ('v', Dir { y: 1, x: 1 }),
+//         ('>', Dir { y: 1, x: 2 }),
+//     ]);
+//     let keypad_inverted = keypad.iter().map(|(&k, &v)| (v, k)).collect();
+//     (keypad, keypad_inverted)
 // }
 
-fn keypresses_rec(single_step: &str, depth: u8, n_map: &HashMap<&str, Vec<&str>>) -> String {
-    if depth == 0 {
-        single_step[0..single_step.len() - 1].to_owned()
-    } else {
-        let next_step = n_map.get(single_step).expect("Couldn't find step in map");
-        let mut min_len = usize::MAX;
-        let mut res_str = String::new();
-        for &step_branch in next_step {
-            let mut total_len = String::new();
-            for i in 0..step_branch.len() - 1 {
-                total_len = format!("{}{}", total_len, keypresses_rec(&step_branch[i..i + 2], depth - 1, n_map));
-            }
-            if min_len >= total_len.len() {
-                min_len = total_len.len();
-                res_str = total_len + "A";
-            }
-        }
-        res_str
-    }
-}
-
-fn keypresses_2(code: &str, depth: u8) -> usize {
-    let numeric_map = HashMap::from([
-        ("A^", vec!["<A"]),
-        ("A>", vec!["vA"]),
-        ("Av", vec!["v<A", "<vA"]),
-        ("A<", vec!["v<<A", "<v<A"]),
-        ("AA", vec!["A"]),
-        ("^A", vec![">A"]),
-        ("^v", vec!["vA"]),
-        ("^<", vec!["v<A"]),
-        ("^>", vec!["v>A", ">vA"]),
-        ("^^", vec!["A"]),
-        (">A", vec!["^A"]),
-        (">v", vec!["<A"]),
-        ("><", vec!["<<A"]),
-        (">^", vec!["<^A", "^<A"]),
-        (">>", vec!["A"]),
-        ("v<", vec!["<A"]),
-        ("v>", vec![">A"]),
-        ("v^", vec!["^A"]),
-        ("vA", vec!["^>A", ">^A"]),
-        ("vv", vec!["A"]),
-        ("<v", vec![">A"]),
-        ("<>", vec![">>A"]),
-        ("<^", vec![">^A"]),
-        ("<A", vec![">>^A", ">^>A"]),
-        ("<<", vec!["A"]),
-    ]);
-
-    let mut res = 0;
-    let mut res_str = String::new();
-    for i in 0..code.len() - 1 {
-        let s = keypresses_rec(&code[i..i + 2], depth, &numeric_map);
-        println!("{}", s);
-        res_str = format!("{}{}", res_str, s);
-        // res += keypresses_rec(&code[i..i + 2], depth, &numeric_map);
-    }
-    println!("End {}", res_str);
-    res
-}
-
-pub fn solve_part_one(input: &str) -> AoCResult {
+pub fn solve(input: &str, depth: u8) -> AoCResult {
     let codes = parse_input(input);
+    let (num_keypad, num_keypad_inv) = num_keypads();
 
-    let num_keypad = HashMap::from([
-        ('7', Pos { y: 0, x: 0 }),
-        ('8', Pos { y: 0, x: 1 }),
-        ('9', Pos { y: 0, x: 2 }),
-        ('4', Pos { y: 1, x: 0 }),
-        ('5', Pos { y: 1, x: 1 }),
-        ('6', Pos { y: 1, x: 2 }),
-        ('1', Pos { y: 2, x: 0 }),
-        ('2', Pos { y: 2, x: 1 }),
-        ('3', Pos { y: 2, x: 2 }),
-        ('0', Pos { y: 3, x: 1 }),
-        ('A', Pos { y: 3, x: 2 }),
-    ]);
-
-    let dir_keypad = HashMap::from([
-        ('^', Pos { y: 0, x: 1 }),
-        ('A', Pos { y: 0, x: 2 }),
-        ('<', Pos { y: 1, x: 0 }),
-        ('v', Pos { y: 1, x: 1 }),
-        ('>', Pos { y: 1, x: 2 }),
-    ]);
-
-    let mut res = 0;
-    for code in codes {
+    let res = codes.iter().fold(0, |acc, code| {
         let mut min_len = usize::MAX;
 
-        for robot_1 in keypresses(&num_keypad, Pos { y: 3, x: 2 }, code) {
-            let m = keypresses_2(&format!("{}{}", "A", robot_1), 1);
-            println!("{} {}", robot_1, m);
-            break;
-
-            // for robot_2 in keypresses(&dir_keypad, Pos { y: 0, x: 2 }, &robot_1) {
-            //     for robot_3 in keypresses(&dir_keypad, Pos { y: 0, x: 2 }, &robot_2) {
-            //         min_len = min_len.min(robot_3.len());
-            //     }
-            // }
+        for robot_num in keypad_sim(&num_keypad, &num_keypad_inv, Dir { y: 3, x: 2 }, code) {
+            let robot_dir = expand_moves(&robot_num, depth);
+            min_len = min_len.min(robot_dir);
         }
-
-       
-        min_len = 0;
         let n = code
             .chars()
             .filter(|c| c.is_digit(10))
             .collect::<String>()
             .parse::<usize>()
             .unwrap();
-        res += min_len * n;
-
-        break;
-    }
-
+        acc + min_len * n
+    });
     AoCResult::Int(res as i64)
 }
 
-pub fn solve_part_two(input: &str) -> AoCResult {
-    let codes = parse_input(input);
+pub fn solve_part_one(input: &str) -> AoCResult {
+    solve(input, 2)
+}
 
-    let res = 0;
-    AoCResult::Int(res as i64)
+pub fn solve_part_two(input: &str) -> AoCResult {
+    solve(input, 25)
 }

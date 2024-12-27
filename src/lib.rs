@@ -127,3 +127,14 @@ impl Dir {
         }
     }
 }
+
+impl Sub for Dir {
+    type Output = Dir;
+
+    fn sub(self, other: Dir) -> Dir {
+        Dir {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        }
+    }
+}
