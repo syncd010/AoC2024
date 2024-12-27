@@ -6,12 +6,13 @@ As usual, there's very little or no error handling so the solutions panic if the
 
 Code is in `src/`, input files are in `data/`.
 
-## Build
+## Build and Test
 
 With [Cargo](https://doc.rust-lang.org/cargo/getting-started/index.html)
 
-
 > `cargo build`
+>
+> `cargo test`
 
 ## Usage
 
@@ -21,6 +22,20 @@ To run, from the root dir:
 > `cargo run -- $day [-t] [$file]`
 
 This will run the 2 parts of the specified `$day`, using `$file` as input. If no file is specified `./data/input{$day}` is used as input. If no file is specified and `-t` is used, `./data/input{$day}Test` is used instead.
+
+## Post-Event Impressions
+
+The following are approximate runtimes of each puzzle on a i5-11400, in ms:
+
+|    Day    |    Part 1    |    Part 2    |
+|:---------:|:------------:|:------------:|
+|     1     |     0.11     |     0.12     |
+|     2     |     0.19     |     0.24     |
+|     3     |     0.39     |     0.49     |
+|     4     |     0.40     |     0.27     |
+|     5     |     0.22     |     0.40     |
+|     6     |     0.72     |    27.40     |
+| **Total** | **34.39 ms** | **89.56 ms** |
 
 ## [Day 1](https://adventofcode.com/2024/day/1)
 
@@ -34,11 +49,13 @@ And we're off. The borrow checker put up some fight, but that's the price of lea
 
 ## [Day 2](https://adventofcode.com/2024/day/2)
 
+Part two was surprisingly twisted, so early in the game.
+
 **Input parsing:** Vector of vector of integers
 
 **Part one solution:** Check that each sequence is increasing or decreasing, respecting the bounds, by taking the difference between adjacent elements.
 
-**Part two solution:** Surprisingly twisted. The straightforward and inefficient way to solve it is to iteratively remove each value from a sequence and check if it is valid, but we can do much better, by identifying the index of the first sequence break and just remove the element at that index (and the successor), and check if the sequence is valid.
+**Part two solution:** The straightforward and inefficient way to solve it is to iteratively remove each value from a sequence and check if it is valid, but we can do much better, by identifying the index of the first sequence break and just remove the element at that index (and the successor), and check if the sequence is valid.
 
 ## [Day 3](https://adventofcode.com/2024/day/3)
 
@@ -46,7 +63,7 @@ Straightforward enough, given that the work is mostly done via regular expressio
 
 **Part one solution:** With a regular expression capture the relevant values between `mul()`.
 
-**Part two solution:** For this we need an global regular expression to match `mul`, `don't` and `do`, and a local one focused on the `mul()` to extract the inner values.
+**Part two solution:** For this we need a global regular expression to match `mul`, `don't` and `do`, and a local one focused on the `mul()` to extract the inner values.
 
 ## [Day 4](https://adventofcode.com/2024/day/4)
 

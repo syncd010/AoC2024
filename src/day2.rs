@@ -1,26 +1,26 @@
 use aoc2024::AoCResult;
+use itertools::Itertools;
 
 fn parse_input(input: &str) -> Vec<Vec<i32>> {
-    let vals = input
+    input
+        .trim()
         .lines()
         .filter(|line| !line.is_empty())
         .map(|line| {
             line.split_whitespace()
                 .map(|v| v.parse().unwrap())
-                .collect::<Vec<_>>()
+                .collect_vec()
         })
-        .collect::<Vec<_>>();
-    vals
+        .collect_vec()
 }
 
 pub fn valid_levels(levels: &Vec<i32>) -> bool {
-    let diff: Vec<_> = levels.windows(2).map(|v| v[1] - v[0]).collect();
-    return diff.iter().all(|v| *v >= 1 && *v <= 3) || diff.iter().all(|v| *v <= -1 && *v >= -3);
+    let diff = levels.windows(2).map(|v| v[1] - v[0]).collect_vec();
+    diff.iter().all(|&v| v >= 1 && v <= 3) || diff.iter().all(|&v| v <= -1 && v >= -3)
 }
 
 pub fn solve_part_one(input: &str) -> AoCResult {
-    let vals = parse_input(input);
-    let res = vals
+    let res = parse_input(input)
         .iter()
         .map(|levels| valid_levels(levels) as i32)
         .sum::<i32>();
@@ -28,26 +28,24 @@ pub fn solve_part_one(input: &str) -> AoCResult {
 }
 
 pub fn solve_part_two(input: &str) -> AoCResult {
-    let vals = parse_input(input);
-
-    let res = vals
+    let res = parse_input(input)
         .iter()
         .map(|levels| {
             if valid_levels(levels) {
                 return 1;
             }
 
-            let diff: Vec<_> = levels.windows(2).map(|v| v[1] - v[0]).collect();
+            let diff = levels.windows(2).map(|v| v[1] - v[0]).collect_vec();
             // Index of first ascending sequence break
             let asc_break_idx = diff
                 .iter()
-                .map(|v| (*v >= 1 && *v <= 3) as i32)
+                .map(|&v| (v >= 1 && v <= 3) as u8)
                 .position(|v| v == 0)
                 .unwrap_or(0);
             // Index of first descending sequence break
             let dsc_break_idx = diff
                 .iter()
-                .map(|v| (*v <= -1 && *v >= -3) as i32)
+                .map(|&v| (v <= -1 && v >= -3) as u8)
                 .position(|v| v == 0)
                 .unwrap_or(0);
 
@@ -66,7 +64,41 @@ pub fn solve_part_two(input: &str) -> AoCResult {
             }
             return 0;
         })
-        .sum::<i32>();
+        .sum();
 
-    AoCResult::Int(res as i64)
+    AoCResult::Int(res)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input2Test"),
+        include_str!("../data/input2"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [2, 663];
+    const EXPECTED_PART_TWO: [i64; 2] = [4, 692];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }

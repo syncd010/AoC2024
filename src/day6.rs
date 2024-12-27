@@ -1,11 +1,13 @@
 use aoc2024::AoCResult;
+use itertools::Itertools;
 
 fn parse_input(input: &str) -> Vec<Vec<char>> {
     let map = input
+        .trim()
         .lines()
         .filter(|line| !line.is_empty())
-        .map(|line| line.chars().collect::<Vec<_>>())
-        .collect::<Vec<_>>();
+        .map(|line| line.chars().collect_vec())
+        .collect_vec();
     map
 }
 
@@ -83,11 +85,9 @@ pub fn solve_part_two(input: &str) -> AoCResult {
     let mut map = parse_input(input);
     let start = find_start(&map);
     let (_, visited) = walk_map(&map, start);
-    let height = map.len();
-    let width = map[0].len();
+    let (height, width) = (map.len(), map[0].len());
 
     let mut res = 0i64;
-
     for y in 0..height {
         for x in 0..width {
             if visited[y * width + x] != 0 {
@@ -102,4 +102,38 @@ pub fn solve_part_two(input: &str) -> AoCResult {
     }
 
     AoCResult::Int(res)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input6Test"),
+        include_str!("../data/input6"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [41, 4663];
+    const EXPECTED_PART_TWO: [i64; 2] = [6, 1530];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }

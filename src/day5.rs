@@ -1,29 +1,25 @@
-use std::collections::HashMap;
-
 use aoc2024::AoCResult;
+use itertools::Itertools;
+use std::collections::HashMap;
 
 pub fn parse_int(s: &str) -> i32 {
     s.parse().unwrap()
 }
 
 fn parse_input(input: &str) -> (HashMap<i32, Vec<i32>>, Vec<Vec<i32>>) {
-    let mut in_rules_section = true;
-    let mut rules = HashMap::<i32, Vec<i32>>::new();
-    let mut orders = Vec::new();
-    for line in input.lines() {
-        if line.is_empty() {
-            in_rules_section = false;
-            continue;
-        }
+    let (rules_in, orders_in) = input.trim().split_once("\n\n").unwrap();
 
-        if in_rules_section {
-            let rule: Vec<_> = line.split('|').map(parse_int).collect();
-            let v = rules.entry(rule[0]).or_insert(Vec::new());
-            v.push(rule[1]);
-        } else {
-            orders.push(line.split(',').map(parse_int).collect::<Vec<_>>());
-        }
-    }
+    let mut rules = HashMap::<i32, Vec<i32>>::new();
+    rules_in.lines().for_each(|line| {
+        let rule = line.split('|').map(parse_int).collect_vec();
+        rules.entry(rule[0]).or_insert(Vec::new()).push(rule[1]);
+    });
+
+    let orders = orders_in
+        .lines()
+        .map(|line| line.split(',').map(parse_int).collect_vec())
+        .collect_vec();
+
     (rules, orders)
 }
 
@@ -31,16 +27,6 @@ fn is_valid_order(order: &Vec<i32>, rules: &HashMap<i32, Vec<i32>>) -> bool {
     order
         .windows(2)
         .all(|v| rules.contains_key(&v[0]) && rules.get(&v[0]).unwrap().contains(&v[1]))
-    // for (i, val) in order.iter().enumerate() {
-    //     if !rules.contains_key(val) {
-    //         continue;
-    //     }
-    //     let successors = rules.get(val).unwrap();
-    //     if order[0..i].iter().any(|v| successors.contains(v)) {
-    //         return false;
-    //     }
-    // }
-    // return true;
 }
 
 pub fn solve_part_one(input: &str) -> AoCResult {
@@ -76,4 +62,38 @@ pub fn solve_part_two(input: &str) -> AoCResult {
         .sum();
 
     AoCResult::Int(res as i64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input5Test"),
+        include_str!("../data/input5"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [143, 5955];
+    const EXPECTED_PART_TWO: [i64; 2] = [123, 4030];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }
