@@ -34,7 +34,13 @@ The following are approximate runtimes of each puzzle on a i5-11400, in ms:
 |     3     |     0.39     |     0.49     |
 |     4     |     0.40     |     0.27     |
 |     5     |     0.22     |     0.40     |
-|     6     |     0.72     |    27.40     |
+|     6     |     0.09     |    27.40     |
+|     7     |     1.01     |    21.60     |
+|     8     |     0.05     |     0.09     |
+|     9     |     0.59     |    16.90     |
+|    10     |     0.19     |     0.17     |
+|    11     |     0.17     |     6.77     |
+|    12     |     0.99     |     0.94     |
 | **Total** | **34.39 ms** | **89.56 ms** |
 
 ## [Day 1](https://adventofcode.com/2024/day/1)
@@ -123,8 +129,7 @@ A quick and dirty solution, with lots of imaginary pointers to keep track of stu
 
 **Part one solution:** On the memory representation, keep 2 pointers, one from the start and one from the end. Copy from the end to the start when the start is an empty space and the end is an occupied space, until they pass each other.
 
-**Part two solution:** Trickier, as we need to use both representations, and an additional one to keep track of the moves that are made. Loop through the initial input representation from the end, trying to find space for each value on the moved input representation from the start. When enough space is found, update the moved input representation ( updating the source and destination and their corresponding neighbors to account for the change in free space) as well
-as the memory representation.
+**Part two solution:** Trickier, as we need to use both representations, and an additional one to keep track of the moves that are made. Loop through the initial input representation from the end, trying to find space for each value on the moved input representation from the start. When enough space is found, update the moved input representation ( updating the source and destination and their corresponding neighbors to account for the change in free space) as well as the memory representation.
 
 ## [Day 10](https://adventofcode.com/2024/day/10)
 

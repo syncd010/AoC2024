@@ -1,24 +1,23 @@
 use aoc2024::AoCResult;
+use itertools::Itertools;
 
 // Returns the input values and a memory representation
 fn parse_input(input: &str) -> (Vec<u32>, Vec<i32>) {
     let vals = input
-        .lines()
-        .next()
-        .unwrap()
+        .trim()
         .chars()
         .map(|c| c.to_digit(10).unwrap())
-        .collect::<Vec<_>>();
+        .collect_vec();
 
     let sz = vals.iter().sum::<u32>() as usize;
     let mut mem = vec![-1; sz];
-    let mut start_ptr = 0usize;
+    let mut mem_ptr = 0usize;
     for (i, &v) in vals.iter().enumerate() {
         let mem_contents = if (i % 2) == 0 { i as i32 / 2 } else { -1 };
         for j in 0..v {
-            mem[start_ptr + j as usize] = mem_contents;
+            mem[mem_ptr + j as usize] = mem_contents;
         }
-        start_ptr += v as usize;
+        mem_ptr += v as usize;
     }
 
     (vals, mem)
@@ -93,4 +92,38 @@ pub fn solve_part_two(input: &str) -> AoCResult {
     }
 
     AoCResult::Int(checksum(&mem) as i64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input9Test"),
+        include_str!("../data/input9"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [1928, 6399153661894];
+    const EXPECTED_PART_TWO: [i64; 2] = [2858, 6421724645083];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }

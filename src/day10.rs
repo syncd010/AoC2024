@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 
-use aoc2024::{AoCResult, Pos, Dir};
-
+use aoc2024::{AoCResult, Dir, Pos};
 
 fn parse_input(input: &str) -> (Vec<Vec<u32>>, Vec<Pos>) {
     let height_map = input
@@ -68,7 +67,6 @@ pub fn solve_part_one(input: &str) -> AoCResult {
         .iter()
         .map(|t| score(*t, &height_map).0)
         .sum::<u32>();
-
     AoCResult::Int(res as i64)
 }
 
@@ -79,6 +77,39 @@ pub fn solve_part_two(input: &str) -> AoCResult {
         .iter()
         .map(|t| score(*t, &height_map).1)
         .sum::<u32>();
-
     AoCResult::Int(res as i64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input10Test"),
+        include_str!("../data/input10"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [36, 582];
+    const EXPECTED_PART_TWO: [i64; 2] = [81, 1302];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }

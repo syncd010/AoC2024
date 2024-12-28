@@ -1,19 +1,12 @@
 use aoc2024::{AoCResult, Dir, Pos};
+use itertools::Itertools;
 
 fn parse_input(input: &str) -> Vec<Vec<char>> {
-    let vals = input
+    input
         .lines()
         .filter(|line| !line.is_empty())
-        .map(|line| line.chars().collect::<Vec<_>>())
-        .collect::<Vec<_>>();
-    vals
-}
-
-pub fn get_grid_dims<T>(grid: &[Vec<T>]) -> Pos {
-    Pos {
-        y: grid.len(),
-        x: grid[0].len(),
-    }
+        .map(|line| line.chars().collect_vec())
+        .collect_vec()
 }
 
 const DIRS: [Dir; 4] = [
@@ -25,7 +18,10 @@ const DIRS: [Dir; 4] = [
 
 pub fn solve(input: &str, part_two: bool) -> AoCResult {
     let grid = parse_input(input);
-    let dims = get_grid_dims(&grid);
+    let dims = Pos {
+        y: grid.len(),
+        x: grid[0].len(),
+    };
     // Whether each position has been visited
     let mut visited = vec![vec![false; dims.x]; dims.y];
     // For each position store a bitmask with bits set for the directions that are outside
@@ -88,4 +84,52 @@ pub fn solve_part_one(input: &str) -> AoCResult {
 
 pub fn solve_part_two(input: &str) -> AoCResult {
     solve(input, true)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input12Test"),
+        include_str!("../data/input12"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [1930, 1465112];
+    const EXPECTED_PART_TWO: [i64; 2] = [1206, 893790];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+
+        let input1 = "AAAA\nBBCD\nBBCC\nEEEC\n";
+        let res = solve_part_one(input1);
+        match res {
+            AoCResult::Int(v) => assert_eq!(v, 140),
+            _ => panic!("Wrong result type returned"),
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+
+        let input1 = "AAAA\nBBCD\nBBCC\nEEEC\n";
+        let res = solve_part_two(input1);
+        match res {
+            AoCResult::Int(v) => assert_eq!(v, 80),
+            _ => panic!("Wrong result type returned"),
+        }
+    }
 }

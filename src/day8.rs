@@ -3,15 +3,16 @@ use std::collections::{HashMap, HashSet};
 
 use aoc2024::AoCResult;
 
+// Return the map as a 2d array of chars, and a hashmap with the locations for each antenna type.
 fn parse_input(input: &str) -> (Vec<Vec<char>>, HashMap<char, Vec<(usize, usize)>>) {
     let map = input
+        .trim()
         .lines()
-        .filter(|line| !line.is_empty())
-        .map(|line| line.chars().collect::<Vec<_>>())
-        .collect::<Vec<_>>();
+        .map(|line| line.chars().collect_vec())
+        .collect_vec();
+
     let mut locations = HashMap::<char, Vec<(usize, usize)>>::new();
     let (height, width) = (map.len(), map[0].len());
-
     for y in 0..height {
         for x in 0..width {
             if map[y][x] != '.' {
@@ -35,8 +36,8 @@ pub fn solve_part_one(input: &str) -> AoCResult {
     let (height, width) = (map.len(), map[0].len());
 
     let mut antinodes = HashSet::new();
-    for loc in locations.iter() {
-        for pair in loc.1.iter().combinations(2) {
+    for (_, loc) in locations.iter() {
+        for pair in loc.iter().combinations(2) {
             let x = pair[0].1 as i32;
             let y = pair[0].0 as i32;
             let dy = pair[1].0 as i32 - y;
@@ -60,8 +61,8 @@ pub fn solve_part_two(input: &str) -> AoCResult {
     let (height, width) = (map.len(), map[0].len());
 
     let mut antinodes = HashSet::new();
-    for loc in locations.iter() {
-        for pair in loc.1.iter().combinations(2) {
+    for (_, loc) in locations.iter() {
+        for pair in loc.iter().combinations(2) {
             let x = pair[0].1 as i32;
             let y = pair[0].0 as i32;
             let dy = pair[1].0 as i32 - y;
@@ -82,4 +83,38 @@ pub fn solve_part_two(input: &str) -> AoCResult {
     }
     let res = antinodes.len();
     AoCResult::Int(res as i64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input8Test"),
+        include_str!("../data/input8"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [14, 240];
+    const EXPECTED_PART_TWO: [i64; 2] = [34, 955];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }
