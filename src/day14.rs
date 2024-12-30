@@ -4,25 +4,25 @@ use aoc2024::*;
 use itertools::Itertools;
 
 fn parse_input(input: &str) -> Vec<(Pos, Dir)> {
-    let vals = input
+    input
+        .trim()
         .lines()
         .filter(|line| !line.is_empty())
         .map(|line| {
-            let mut ps = line[line.find("p=").unwrap() + 2..line.find(" ").unwrap()].split(",");
+            let (p, v) = line.split_once(" ").unwrap();
+            let (px, py) = p[2..].split_once(",").unwrap();
+            let (vx, vy) = v[2..].split_once(",").unwrap();
             let pos = Pos {
-                x: ps.next().unwrap().parse().unwrap(),
-                y: ps.next().unwrap().parse().unwrap(),
+                x: px.parse().unwrap(),
+                y: py.parse().unwrap(),
             };
-
-            let mut ds = line[line.find("v=").unwrap() + 2..].split(",");
             let dir = Dir {
-                x: ds.next().unwrap().parse().unwrap(),
-                y: ds.next().unwrap().parse().unwrap(),
+                x: vx.parse().unwrap(),
+                y: vy.parse().unwrap(),
             };
             (pos, dir)
         })
-        .collect::<Vec<_>>();
-    vals
+        .collect::<Vec<_>>()
 }
 
 fn evolve(pos: usize, dir: isize, time: u32, limit: usize) -> usize {
@@ -37,6 +37,7 @@ pub fn solve_part_one(input: &str) -> AoCResult {
     let limits = (101, 103);
     let mid = (limits.0 / 2, limits.1 / 2);
     let t = 100;
+
     let res = parse_input(input)
         .iter()
         .filter_map(|(p, d)| {
@@ -70,37 +71,71 @@ fn variance(values: &[usize]) -> f64 {
 
 pub fn solve_part_two(input: &str) -> AoCResult {
     let robots = &parse_input(input);
-    let limits = (101, 103);
+    let (limit_x, limit_y) = (101, 103);
 
     let mut pos_x = vec![0; robots.len()];
     let mut pos_y = vec![0; robots.len()];
-    let mut min_var = (f64::MAX, f64::MAX);
-    let mut min_var_idx = (0, 0);
+    let (mut min_var_x, mut min_var_y) = (f64::MAX, f64::MAX);
+    let (mut min_var_t_x, mut min_var_t_y) = (0, 0);
 
     // Find the minimum variance of points dispersion along each of the axis
-    for t in 0..limits.0.max(limits.1) {
-        for (i, &r) in robots.iter().enumerate() {
+    for t in 0..limit_x.max(limit_y) {
+        for (i, (robot_pos, robot_dir)) in robots.iter().enumerate() {
             (pos_x[i], pos_y[i]) = (
-                evolve(r.0.x, r.1.x, t as u32, limits.0),
-                evolve(r.0.y, r.1.y, t as u32, limits.1),
+                evolve(robot_pos.x, robot_dir.x, t as u32, limit_x),
+                evolve(robot_pos.y, robot_dir.y, t as u32, limit_y),
             );
         }
         let var = (variance(&pos_x), variance(&pos_y));
-        if var.0 < min_var.0 {
-            min_var.0 = var.0;
-            min_var_idx.0 = t;
+        if var.0 < min_var_x {
+            min_var_x = var.0;
+            min_var_t_x = t;
         }
-        if var.1 < min_var.1 {
-            min_var.1 = var.1;
-            min_var_idx.1 = t;
+        if var.1 < min_var_y {
+            min_var_y = var.1;
+            min_var_t_y = t;
         }
     }
 
     // Poor man's chinese remainder theorem solution...
-    let mut res = min_var_idx.0;
-    while !(res % limits.0 == min_var_idx.0 && res % limits.1 == min_var_idx.1) {
-        res += limits.0;
+    let mut res = min_var_t_x;
+    while !(res % limit_x == min_var_t_x && res % limit_y == min_var_t_y) {
+        res += limit_x;
     }
 
     AoCResult::Int(res as i64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input14Test"),
+        include_str!("../data/input14"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [21, 233709840];
+    const EXPECTED_PART_TWO: [i64; 2] = [5253, 6620];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }

@@ -215,3 +215,37 @@ pub fn solve_part_one(input: &str) -> AoCResult {
 pub fn solve_part_two(input: &str) -> AoCResult {
     solve(input, 25)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input21Test"),
+        include_str!("../data/input21"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [126384, 215374];
+    const EXPECTED_PART_TWO: [i64; 2] = [154115708116294, 260586897262600];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+}

@@ -1,19 +1,19 @@
-use std::collections::VecDeque;
-
 use aoc2024::*;
+use itertools::Itertools;
+use std::collections::VecDeque;
 
 fn parse_input(input: &str) -> Vec<Pos> {
     let vals = input
+        .trim()
         .lines()
-        .filter(|line| !line.is_empty())
         .map(|line| {
-            let mut v = line.split(",");
+            let (x, y) = line.split_once(",").unwrap();
             Pos {
-                x: v.next().unwrap().parse().unwrap(),
-                y: v.next().unwrap().parse().unwrap(),
+                x: x.parse().unwrap(),
+                y: y.parse().unwrap(),
             }
         })
-        .collect::<Vec<_>>();
+        .collect_vec();
     vals
 }
 
@@ -93,12 +93,6 @@ pub fn solve_part_one(input: &str) -> AoCResult {
     let cutoff_time = 1024;
     // let dims = Pos { x: 7, y: 7 };
     // let cutoff_time = 12;
-    let mut grid = vec![vec![usize::MAX; dims.x]; dims.y];
-    for (i, &pos) in corrupted.iter().enumerate() {
-        if grid[pos.y][pos.x] > i {
-            grid[pos.y][pos.x] = i;
-        }
-    }
     let grid = build_grid(dims, &corrupted);
     let res = bfs(&grid, cutoff_time).expect("Couldn't find a path").time;
     AoCResult::Int(res as i64)
@@ -125,4 +119,41 @@ pub fn solve_part_two(input: &str) -> AoCResult {
     let limit_time = min_time;
     let res = format!("{},{}", corrupted[limit_time].x, corrupted[limit_time].y);
     AoCResult::Str(res)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input18Test"),
+        include_str!("../data/input18"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [22, 286];
+    const EXPECTED_PART_TWO: [&str; 2] = ["6,1", "20,64"];
+
+    #[test]
+    fn test_part_one() {
+        let corrupted = parse_input(INPUT[0]);
+        let dims = Pos { x: 7, y: 7 };
+        let cutoff_time = 12;
+        let grid = build_grid(dims, &corrupted);
+        let res = bfs(&grid, cutoff_time).expect("Couldn't find a path").time;
+        assert_eq!(res as i64, EXPECTED_PART_ONE[0]);
+
+        let res = solve_part_one(INPUT[1]);
+        match res {
+            AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[1]),
+            _ => panic!("Wrong result type returned"),
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        let res = solve_part_two(INPUT[1]);
+        match res {
+            AoCResult::Str(v) => assert_eq!(v, EXPECTED_PART_TWO[1]),
+            _ => panic!("Wrong result type returned"),
+        }
+    }
 }

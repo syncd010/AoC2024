@@ -95,3 +95,37 @@ pub fn solve_part_two(input: &str) -> AoCResult {
         .sum();
     AoCResult::Int(res as i64)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input13Test"),
+        include_str!("../data/input13"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [480, 34787];
+    const EXPECTED_PART_TWO: [i64; 2] = [875318608908, 85644161121698];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+}

@@ -4,10 +4,10 @@ use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 fn parse_input(input: &str) -> HashMap<&str, HashSet<&str>> {
-    let input = input.lines().filter(|line| !line.is_empty()).map(|line| {
-        let mut it = line.split("-");
-        (it.next().unwrap(), it.next().unwrap())
-    });
+    let input = input
+        .trim()
+        .lines()
+        .map(|line| line.split_once("-").unwrap());
 
     let mut graph = HashMap::new();
     for (k, v) in input {
@@ -92,4 +92,38 @@ pub fn solve_part_two(input: &str) -> AoCResult {
 
     let res = max_clique.iter().sorted().copied().join(",");
     AoCResult::Str(res)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input23Test"),
+        include_str!("../data/input23"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [7, 1149];
+    const EXPECTED_PART_TWO: [&str; 2] = ["co,de,ka,ta", "as,co,do,kh,km,mc,np,nt,un,uq,wc,wz,yo"];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Str(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }

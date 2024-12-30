@@ -48,8 +48,28 @@ pub fn solve_part_one(input: &str) -> AoCResult {
     AoCResult::Int(res as i64)
 }
 
-pub fn solve_part_two(input: &str) -> AoCResult {
-    let _vals = parse_input(input);
+pub fn solve_part_two(_input: &str) -> AoCResult {
     let res = 0;
     AoCResult::Int(res as i64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input25Test"),
+        include_str!("../data/input25"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [3, 2933];
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }

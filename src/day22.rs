@@ -1,7 +1,7 @@
 #![allow(unused)]
 use std::collections::HashMap;
 
-use aoc2024::{AoCResult, Dir};
+use aoc2024::AoCResult;
 
 fn parse_input(input: &str) -> Vec<u64> {
     let vals = input
@@ -76,4 +76,45 @@ pub fn solve_part_two(input: &str) -> AoCResult {
 
     let res = *sequence_gains.values().max().unwrap_or(&0);
     AoCResult::Int(res as i64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input22Test"),
+        include_str!("../data/input22"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [37327623, 17005483322];
+    const EXPECTED_PART_TWO: [i64; 2] = [24, 1910];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+
+        let input1 = "1\n2\n3\n2024";
+        let res = solve_part_two(input1);
+        match res {
+            AoCResult::Int(v) => assert_eq!(v, 23),
+            _ => panic!("Wrong result type returned"),
+        }
+    }
 }

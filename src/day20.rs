@@ -1,12 +1,13 @@
 use aoc2024::*;
+use itertools::Itertools;
 use std::rc::Rc;
 
 fn parse_input(input: &str) -> Vec<&[u8]> {
     let grid = input
+        .trim()
         .lines()
-        .filter(|line| !line.is_empty())
         .map(|line| line.as_bytes())
-        .collect::<Vec<_>>();
+        .collect_vec();
     grid
 }
 
@@ -26,6 +27,20 @@ struct SearchState {
     prev: Option<Rc<SearchState>>,
 }
 
+impl Drop for SearchState {
+    fn drop(&mut self) {
+        // From https://rust-unofficial.github.io/too-many-lists/third-drop.html
+        let mut prev = self.prev.take();
+        while let Some(node) = prev {
+            if let Ok(mut node) = Rc::try_unwrap(node) {
+                prev = node.prev.take();
+            } else {
+                break;
+            }
+        }
+    }
+}
+
 const DIRS: [Dir; 4] = [
     Dir { y: 1, x: 0 },
     Dir { y: 0, x: -1 },
@@ -41,7 +56,6 @@ fn find_path(grid: &[&[u8]], start: u8, end: u8) -> Vec<Pos> {
     })]);
     let mut visited = vec![vec![false; grid[0].len()]; grid.len()];
     let mut found = None;
-
     while let Some(state) = frontier.pop() {
         if visited[state.pos.y][state.pos.x] {
             continue;
@@ -79,7 +93,6 @@ fn find_path(grid: &[&[u8]], start: u8, end: u8) -> Vec<Pos> {
         path.push(p.pos);
         ptr = ptr.prev.as_ref().unwrap();
     }
-
     path.reverse();
     path
 }
@@ -107,7 +120,7 @@ fn clamp(center: usize, spread: usize, min: usize, max: usize) -> (usize, usize)
 }
 
 fn count_cheats(grid: &[&[u8]], path: &[Pos], max_cheat_len: usize, min_save: usize) -> usize {
-    assert!(min_save < path.len());
+    assert!(min_save < path.len(), "Input is of the wrong format!");
 
     let grid_path = build_grid_path(&grid, &path);
     let mut res = 0;
@@ -123,7 +136,10 @@ fn count_cheats(grid: &[&[u8]], path: &[Pos], max_cheat_len: usize, min_save: us
                     continue;
                 }
                 let dist = manhattan_dist(start, &Pos { y, x });
-                if dist <= max_cheat_len && save > i_start + dist && save - i_start - dist >= min_save {
+                if dist <= max_cheat_len
+                    && save > i_start + dist
+                    && save - i_start - dist >= min_save
+                {
                     res += 1;
                 }
             }
@@ -148,6 +164,52 @@ pub fn solve_part_two(input: &str) -> AoCResult {
 
 fn manhattan_dist(p1: &Pos, p2: &Pos) -> usize {
     p1.x.abs_diff(p2.x) + p1.y.abs_diff(p2.y)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input20Test"),
+        include_str!("../data/input20"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [0, 1296];
+    const EXPECTED_PART_TWO: [i64; 2] = [0, 977665];
+
+    #[test]
+    fn test_part_one() {
+        let grid = parse_input(INPUT[0]);
+        let path = find_path(&grid, b'S', b'E');
+        let res = count_cheats(&grid, &path, 2, 64);
+        assert_eq!(res, 1);
+        let res = count_cheats(&grid, &path, 2, 38);
+        assert_eq!(res, 3);
+        let res = count_cheats(&grid, &path, 2, 10);
+        assert_eq!(res, 10);
+
+        let res = solve_part_one(INPUT[1]);
+        match res {
+            AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[1]),
+            _ => panic!("Wrong result type returned"),
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        let grid = parse_input(INPUT[0]);
+        let path = find_path(&grid, b'S', b'E');
+        let res = count_cheats(&grid, &path, 20, 76);
+        assert_eq!(res, 3);
+        let res = count_cheats(&grid, &path, 20, 68);
+        assert_eq!(res, 55);
+
+        let res = solve_part_two(INPUT[1]);
+        match res {
+            AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[1]),
+            _ => panic!("Wrong result type returned"),
+        }
+    }
 }
 
 // fn count_cheats(path: &[Pos], max_cheat_len: usize, min_save: usize) -> usize {

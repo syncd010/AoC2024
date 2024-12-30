@@ -1,28 +1,27 @@
-use std::collections::{HashMap, HashSet};
-
 use aoc2024::*;
+use itertools::Itertools;
+use std::collections::{HashMap, HashSet};
 
 // Return the grid and the list of directions
 fn parse_input(input: &str) -> (Vec<Vec<char>>, Vec<Dir>) {
-    let mut grid = Vec::new();
-    let mut directions = Vec::new();
-    let mut in_grid = true;
-    for line in input.lines() {
-        if line.is_empty() {
-            in_grid = false;
-        } else if in_grid {
-            grid.push(line.chars().collect());
-        } else {
-            directions.extend(line.chars().map(|c| match c {
+    let (grid, directions) = input.trim().split_once("\n\n").unwrap();
+
+    let grid = grid
+        .lines()
+        .map(|line| line.chars().collect_vec())
+        .collect_vec();
+    let directions = directions
+        .lines()
+        .flat_map(|line| {
+            line.chars().map(|c| match c {
                 '<' => Dir { x: -1, y: 0 },
                 '^' => Dir { x: 0, y: -1 },
                 '>' => Dir { x: 1, y: 0 },
                 'v' => Dir { x: 0, y: 1 },
-                _ => panic!("Unkown direction"),
-            }));
-        }
-    }
-
+                _ => panic!("Unknown direction"),
+            })
+        })
+        .collect_vec();
     (grid, directions)
 }
 
@@ -141,7 +140,7 @@ pub fn solve_part_two(input: &str) -> AoCResult {
     for d in directions {
         // Move all connected cells
         if let Some(frontier) = expand_frontier(&grid, pos, d) {
-            // Backup to scracth
+            // Backup to scratch
             for p in frontier.iter() {
                 scratch_grid[p.y][p.x] = grid[p.y][p.x];
             }
@@ -169,4 +168,38 @@ pub fn solve_part_two(input: &str) -> AoCResult {
         .sum();
 
     AoCResult::Int(res as i64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input15Test"),
+        include_str!("../data/input15"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [10092, 1451928];
+    const EXPECTED_PART_TWO: [i64; 2] = [9021, 1462788];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }

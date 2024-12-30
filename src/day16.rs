@@ -173,3 +173,31 @@ pub fn solve_part_two(input: &str) -> AoCResult {
         AoCResult::Int(sol.unwrap().1 as i64)
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input16Test"),
+        include_str!("../data/input16"),
+    ];
+    const EXPECTED_PART_ONE: [u64; 2] = [11048, 135536];
+    const EXPECTED_PART_TWO: [u64; 2] = [64, 583];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve(INPUT[i]);
+            assert_eq!(res.0, EXPECTED_PART_ONE[i]);
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve(INPUT[i]);
+            assert_eq!(res.1, EXPECTED_PART_TWO[i]);
+        }
+    }
+}

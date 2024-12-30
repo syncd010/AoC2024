@@ -41,6 +41,19 @@ The following are approximate runtimes of each puzzle on a i5-11400, in ms:
 |    10     |     0.19     |     0.17     |
 |    11     |     0.17     |     6.77     |
 |    12     |     0.99     |     0.94     |
+|    13     |     0.10     |     0.12     |
+|    14     |     0.08     |     0.28     |
+|    15     |     0.54     |     2.10     |
+|    16     |    16.11     |     0.00     |
+|    17     |     0.00     |     0.04     |
+|    18     |     0.25     |     0.31     |
+|    19     |     4.75     |    15.10     |
+|    20     |     1.40     |    18.24     |
+|    21     |     0.15     |     2.04     |
+|    22     |     8.35     |    222.94    |
+|    23     |     1.80     |     5.10     |
+|    24     |     0.17     |     0.03     |
+|    25     |     0.54     |     0.07     |
 | **Total** | **34.39 ms** | **89.56 ms** |
 
 ## [Day 1](https://adventofcode.com/2024/day/1)
@@ -163,7 +176,7 @@ Getting part two took right some time, but in the end it's similar to part one, 
 
 ## [Day 13](https://adventofcode.com/2024/day/13)
 
-It's a simple system of linear equations, directly solver through linear algebra. With numpy this would be a lot faster, as is, and because i don't want to use external crates, i implemented the necessary operations to calculate determinant, dot product and inverse 2x2 matrices.
+A simple system of linear equations, directly solver through linear algebra. With numpy this would be a lot faster, as is, and because i don't want to use external crates, i implemented the necessary operations to calculate determinant, dot product and inverse 2x2 matrices.
 
 **Input parsing:** For each "machine" returns the prize vector and the corresponding matrix.
 
@@ -237,7 +250,7 @@ Easy enough, a straightforward BFS. Reading the description i got the impression
 
 Nice twist on part two. Part one was relatively straightforward, I chose to just keep track of the reached indexes on the design, and not all the possible pattern combinations to do that, which helped with performance. Looking at part two, i though that just by changing 3 or 4 lines of the solution i had would be enough, which indeed was, but only with the test input... On the real input it didn't seem to want to end, so i had to get back to the drawing board and create a different solution.
 
-**Input parsing:** The patterns present on the first line and the designs on the other lines, both as vector of vector of chars.
+**Input parsing:** The patterns present on the first line and the designs on the other lines, both as vector of strings.
 
 **Part one solution:** For each design, keep a list of the reached indexes up until that point, and try to fit each of the patterns from that index on. If the pattern fits and the end of the design is reached, break and increase the solution counter, otherwise, update the list of reached indexes with the pattern length.
 
@@ -248,8 +261,6 @@ Nice twist on part two. Part one was relatively straightforward, I chose to just
 Getting to a solution was easy and quick enough. Build a path on the maze, saving the corresponding positions. Then iterate through the combinations of those positions and for each pair check if their manhattan distance is less than the max cheat distance, and if the saved time (which is tha path length between the positions minus their manhattan distance) is bigger than what is intended.
 
 This was straightforward but took tens of milliseconds to run, so i looked for some optimizations. For now, what i come up with is build a second grid with the path marked.
-
-Need revisiting
 
 **Input parsing:** The grid.
 

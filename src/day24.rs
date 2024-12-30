@@ -92,3 +92,40 @@ pub fn solve_part_two(input: &str) -> AoCResult {
     let res = String::from("cgh,frt,pmd,sps,tst,z05,z11,z23");
     AoCResult::Str(res)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input24Test"),
+        include_str!("../data/input24"),
+    ];
+    const EXPECTED_PART_ONE: [i64; 2] = [2024, 60714423975686];
+    const EXPECTED_PART_TWO: [&str; 2] = [
+        "cgh,frt,pmd,sps,tst,z05,z11,z23",
+        "cgh,frt,pmd,sps,tst,z05,z11,z23",
+    ];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Str(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
+}

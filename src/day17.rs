@@ -5,7 +5,7 @@ type Regs = [u64; 3];
 
 fn parse_input(input: &str) -> (Regs, Vec<u8>) {
     let mut regs = [0, 0, 0];
-    let mut instuct = Vec::new();
+    let mut program = Vec::new();
     let reg_map = [
         ("Register A:", 0usize),
         ("Register B:", 1usize),
@@ -23,12 +23,12 @@ fn parse_input(input: &str) -> (Regs, Vec<u8>) {
             line[line.find(":").unwrap() + 2..]
                 .split(",")
                 .for_each(|v| {
-                    instuct.push(v.parse().unwrap());
+                    program.push(v.parse().unwrap());
                 });
         }
     }
 
-    (regs, instuct)
+    (regs, program)
 }
 
 fn combo_op(op: u8, regs: &Regs) -> u64 {
@@ -37,7 +37,7 @@ fn combo_op(op: u8, regs: &Regs) -> u64 {
         4 => regs[0],
         5 => regs[1],
         6 => regs[2],
-        _ => panic!("Uninplemented"),
+        _ => panic!("Unimplemented"),
     }
 }
 
@@ -77,7 +77,7 @@ fn run(regs: &mut Regs, instruct: &[u8]) -> Vec<u64> {
                 regs[2] = regs[0] / 2u64.pow(combo_op(operand, &regs) as u32);
             }
             _ => {
-                panic!("Unknow instruction!");
+                panic!("Unknown instruction!");
             }
         }
         ip += 2;
@@ -134,4 +134,45 @@ pub fn solve_part_two(input: &str) -> AoCResult {
 
     let res = *valid.iter().min().unwrap() / 8;
     AoCResult::Int(res as i64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: [&str; 2] = [
+        include_str!("../data/input17Test"),
+        include_str!("../data/input17"),
+    ];
+    const EXPECTED_PART_ONE: [&str; 2] = ["5,7,3,0", "7,6,5,3,6,5,7,0,4"];
+    const EXPECTED_PART_TWO: [i64; 2] = [117440, 190615597431823];
+
+    #[test]
+    fn test_part_one() {
+        for i in 0..2 {
+            let res = solve_part_one(INPUT[i]);
+            match res {
+                AoCResult::Str(v) => assert_eq!(v, EXPECTED_PART_ONE[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+
+        let input1 = "Register A: 729\nRegister B: 0\nRegister C: 0\n\nProgram: 0,1,5,4,3,0\n";
+        let res = solve_part_one(input1);
+        match res {
+            AoCResult::Str(v) => assert_eq!(v, "4,6,3,5,6,3,5,2,1,0"),
+            _ => panic!("Wrong result type returned"),
+        }
+    }
+
+    #[test]
+    fn test_part_two() {
+        for i in 0..2 {
+            let res = solve_part_two(INPUT[i]);
+            match res {
+                AoCResult::Int(v) => assert_eq!(v, EXPECTED_PART_TWO[i]),
+                _ => panic!("Wrong result type returned"),
+            }
+        }
+    }
 }
