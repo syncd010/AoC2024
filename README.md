@@ -25,36 +25,38 @@ This will run the 2 parts of the specified `$day`, using `$file` as input. If no
 
 ## Post-Event Impressions
 
+Similar to last year, i tried to be relatively efficient on my solutions. The goal was never to develop the fastest solution, but to develop a simple, readable and efficient solution. Also, similar to last year, i had the generic goal of keeping the total runtime of all days under 100ms. Didn't achieve this, the total runtime is almost 200ms. Not sure if I'll revisit this in the future...
+
 The following are approximate runtimes of each puzzle on a i5-11400, in ms:
 
-|    Day    |    Part 1    |    Part 2    |
-|:---------:|:------------:|:------------:|
-|     1     |     0.11     |     0.12     |
-|     2     |     0.19     |     0.24     |
-|     3     |     0.39     |     0.49     |
-|     4     |     0.40     |     0.27     |
-|     5     |     0.22     |     0.40     |
-|     6     |     0.09     |    27.40     |
-|     7     |     1.01     |    21.60     |
-|     8     |     0.05     |     0.09     |
-|     9     |     0.59     |    16.90     |
-|    10     |     0.19     |     0.17     |
-|    11     |     0.17     |     6.77     |
-|    12     |     0.99     |     0.94     |
-|    13     |     0.10     |     0.12     |
-|    14     |     0.08     |     0.28     |
-|    15     |     0.54     |     2.10     |
-|    16     |    16.11     |     0.00     |
-|    17     |     0.00     |     0.04     |
-|    18     |     0.25     |     0.31     |
-|    19     |     4.75     |    15.10     |
-|    20     |     1.40     |    18.24     |
-|    21     |     0.15     |     2.04     |
-|    22     |     8.35     |    222.94    |
-|    23     |     1.80     |     5.10     |
-|    24     |     0.17     |     0.03     |
-|    25     |     0.54     |     0.07     |
-| **Total** | **34.39 ms** | **89.56 ms** |
+|    Day    |    Part 1    |    Part 2     |
+|:---------:|:------------:|:-------------:|
+|     1     |     0.11     |     0.12      |
+|     2     |     0.19     |     0.24      |
+|     3     |     0.39     |     0.49      |
+|     4     |     0.40     |     0.27      |
+|     5     |     0.22     |     0.40      |
+|     6     |     0.09     |     27.40     |
+|     7     |     1.01     |     21.60     |
+|     8     |     0.05     |     0.09      |
+|     9     |     0.59     |     16.90     |
+|    10     |     0.19     |     0.17      |
+|    11     |     0.17     |     6.77      |
+|    12     |     0.99     |     0.94      |
+|    13     |     0.10     |     0.12      |
+|    14     |     0.08     |     0.28      |
+|    15     |     0.54     |     2.10      |
+|    16     |    16.11     |     0.00      |
+|    17     |     0.00     |     0.04      |
+|    18     |     0.25     |     0.31      |
+|    19     |     4.75     |     15.10     |
+|    20     |     1.40     |     18.24     |
+|    21     |     0.15     |     2.04      |
+|    22     |     8.35     |     31.17     |
+|    23     |     1.80     |     5.10      |
+|    24     |     0.17     |     0.03      |
+|    25     |     0.54     |     0.07      |
+| **Total** | **38.64 ms** | **149.99 ms** |
 
 ## [Day 1](https://adventofcode.com/2024/day/1)
 
@@ -290,7 +292,7 @@ The first insight is that the directional keypad is simple enough to enable hard
 
 ## [Day 22](https://adventofcode.com/2024/day/22)
 
-After yesterday, this was a breeze. The description is confusing, but the intent is straightforward. Still tried to optimize the runtime by using bitwise operations instead of arithmetic and tuples, but it's still not enough. Need to take a second look.
+After yesterday, this was a breeze. The description is confusing, but the intent is straightforward. Tried to optimize the runtime by using bitwise operations instead of arithmetic and tuples, but it didn't help much. What did help was not using Hashmaps to store the sequence differences and instead use a vector: given that there can only be 19**4 different sequences, these can be stored in a vector and accessed directly by index.
 
 **Input parsing:** Input numbers.
 
@@ -310,11 +312,13 @@ Graph theory. Part one is finding all triangle cliques in the graph and part two
 
 ## [Day 24](https://adventofcode.com/2024/day/24)
 
-**Input parsing:**
+We've already had low level code, it's time for digital circuits. Part one is a straightforward simulation of the circuit. Part two is tricky. In the end, i dumped the adder circuit to GraphViz (in dot language), and manually checked each adder sub circuit, identifying the faulty ones. Not really proud of this approach, but developing a generic solution to identify faulty adders sounds like a lot of work, and frankly, not much fun...
 
-**Part one solution:**
+**Input parsing:** The wires and the circuits.
 
-**Part two solution:**
+**Part one solution:** Simulation of the circuit.
+
+**Part two solution:** Dumped the circuit as a graph in dot language, passed it through GraphViz and identified the faulty circuits.
 
 ## [Day 25](https://adventofcode.com/2024/day/25)
 

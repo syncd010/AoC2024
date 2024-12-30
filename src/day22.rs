@@ -1,5 +1,4 @@
 #![allow(unused)]
-use std::collections::HashMap;
 
 use aoc2024::AoCResult;
 
@@ -40,43 +39,85 @@ pub fn solve_part_two(input: &str) -> AoCResult {
     let secrets = parse_input(input);
     let limit = 2000 - 1;
 
+    // Prices and differences in prices for each monkey
     let mut prices = vec![vec![0u8; limit + 1]; secrets.len()];
     let mut diff = vec![vec![0i8; limit]; secrets.len()];
+    let diff_sz = 19usize;
 
-    // let mut sequence_gains = HashMap::<(i8, i8, i8, i8), u64>::new();
-    let mut sequence_gains = HashMap::<u64, u64>::new();
+    // This will contain the gain for a specific sequence. There can be at most 19**4 different sequences
+    let mut sequence_gains = vec![0u64; diff_sz.pow(4)];
     for (monkey, &(mut secret)) in secrets.iter().enumerate() {
         prices[monkey][0] = (secret % 10) as u8;
-        // let mut monkey_sequence_prices = HashMap::<(i8, i8, i8, i8), u8>::new();
-        let mut monkey_sequence_prices = HashMap::<u64, u8>::new();
+        // First price seen for each different sequence
+        let mut monkey_sequence_prices = vec![0u8; diff_sz.pow(4)];
         for i in 0..limit {
+            // Calculate price and diff to the previous
             secret = ((secret << 6) ^ secret) & 0xffffff;
             secret = ((secret >> 5) ^ secret) & 0xffffff;
             secret = ((secret << 11) ^ secret) & 0xffffff;
-            prices[monkey][i + 1] = (secret % 10) as u8;
+            let price = (secret % 10) as u8;
+            prices[monkey][i + 1] = price;
             diff[monkey][i] = prices[monkey][i + 1] as i8 - prices[monkey][i] as i8;
-        }
 
-        for i in 3..limit {
-            // let k = (diff[monkey][i - 3], diff[monkey][i - 2], diff[monkey][i - 1], diff[monkey][i]);
-            let k = ((diff[monkey][i - 3] as u8) as u64) << 24
-                | ((diff[monkey][i - 2] as u8) as u64) << 16
-                | ((diff[monkey][i - 1] as u8) as u64) << 8
-                | ((diff[monkey][i] as u8) as u64);
-            let price = prices[monkey][i + 1];
-            monkey_sequence_prices.entry(k).or_insert(price);
-        }
-        for (k, price) in monkey_sequence_prices {
-            sequence_gains
-                .entry(k)
-                .and_modify(|v| *v += price as u64)
-                .or_insert(price as u64);
+            if i >= 3 {
+                // Calculate diff sequence and if it's the first time we see it, store it
+                let k = (diff[monkey][i - 3] + 9) as usize * diff_sz.pow(3)
+                    + (diff[monkey][i - 2] + 9) as usize * diff_sz.pow(2)
+                    + (diff[monkey][i - 1] + 9) as usize * diff_sz
+                    + (diff[monkey][i] + 9) as usize;
+                if monkey_sequence_prices[k] == 0 {
+                    monkey_sequence_prices[k] = price;
+
+                    sequence_gains[k] += price as u64;
+                }
+            }
         }
     }
 
-    let res = *sequence_gains.values().max().unwrap_or(&0);
+    let res = *sequence_gains.iter().max().unwrap();
     AoCResult::Int(res as i64)
 }
+
+// pub fn solve_part_two(input: &str) -> AoCResult {
+//     let secrets = parse_input(input);
+//     let limit = 2000 - 1;
+//
+//     let mut prices = vec![vec![0u8; limit + 1]; secrets.len()];
+//     let mut diff = vec![vec![0i8; limit]; secrets.len()];
+//
+//     // let mut sequence_gains = HashMap::<(i8, i8, i8, i8), u64>::new();
+//     let mut sequence_gains = HashMap::<u64, u64>::new();
+//     for (monkey, &(mut secret)) in secrets.iter().enumerate() {
+//         prices[monkey][0] = (secret % 10) as u8;
+//         // let mut monkey_sequence_prices = HashMap::<(i8, i8, i8, i8), u8>::new();
+//         let mut monkey_sequence_prices = HashMap::<u64, u8>::new();
+//         for i in 0..limit {
+//             secret = ((secret << 6) ^ secret) & 0xffffff;
+//             secret = ((secret >> 5) ^ secret) & 0xffffff;
+//             secret = ((secret << 11) ^ secret) & 0xffffff;
+//             prices[monkey][i + 1] = (secret % 10) as u8;
+//             diff[monkey][i] = prices[monkey][i + 1] as i8 - prices[monkey][i] as i8;
+//         }
+//
+//         for i in 3..limit {
+//             // let k = (diff[monkey][i - 3], diff[monkey][i - 2], diff[monkey][i - 1], diff[monkey][i]);
+//             let k = ((diff[monkey][i - 3] as u8) as u64) << 24
+//                 | ((diff[monkey][i - 2] as u8) as u64) << 16
+//                 | ((diff[monkey][i - 1] as u8) as u64) << 8
+//                 | ((diff[monkey][i] as u8) as u64);
+//             let price = prices[monkey][i + 1];
+//             monkey_sequence_prices.entry(k).or_insert(price);
+//         }
+//         for (k, price) in monkey_sequence_prices {
+//             sequence_gains
+//                 .entry(k)
+//                 .and_modify(|v| *v += price as u64)
+//                 .or_insert(price as u64);
+//         }
+//     }
+//     let res = *sequence_gains.values().max().unwrap_or(&0);
+//     AoCResult::Int(res as i64)
+// }
 
 #[cfg(test)]
 mod tests {
