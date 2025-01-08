@@ -39,7 +39,7 @@ The following are approximate runtimes of each puzzle on a i5-11400, in ms:
 |     6     |     0.09     |     27.40     |
 |     7     |     1.01     |     21.60     |
 |     8     |     0.05     |     0.09      |
-|     9     |     0.59     |     16.90     |
+|     9     |     0.59     |     0.50      |
 |    10     |     0.19     |     0.17      |
 |    11     |     0.17     |     6.77      |
 |    12     |     0.99     |     0.94      |
@@ -56,7 +56,7 @@ The following are approximate runtimes of each puzzle on a i5-11400, in ms:
 |    23     |     1.80     |     5.10      |
 |    24     |     0.17     |     0.03      |
 |    25     |     0.54     |     0.07      |
-| **Total** | **38.64 ms** | **149.99 ms** |
+| **Total** | **38.64 ms** | **133.99 ms** |
 
 ## [Day 1](https://adventofcode.com/2024/day/1)
 
@@ -144,7 +144,7 @@ A quick and dirty solution, with lots of imaginary pointers to keep track of stu
 
 **Part one solution:** On the memory representation, keep 2 pointers, one from the start and one from the end. Copy from the end to the start when the start is an empty space and the end is an occupied space, until they pass each other.
 
-**Part two solution:** Trickier, as we need to use both representations, and an additional one to keep track of the moves that are made. Loop through the initial input representation from the end, trying to find space for each value on the moved input representation from the start. When enough space is found, update the moved input representation ( updating the source and destination and their corresponding neighbors to account for the change in free space) as well as the memory representation.
+**Part two solution:** Trickier, as we need to use both representations, and an additional one to keep track of the moves that are made. Loop through the initial input representation from the end, trying to find space for each value on the moved input representation from the start. When enough space is found, update the moved input representation (updating the source and destination and their corresponding neighbors to account for the change in free space) as well as the memory representation. To speed things up, keep track of the index to where values where moved: requests to move more space than that can only be found in higher indexes, so, for a given space request we can start searching starting from that index, instead of from the beginning.
 
 ## [Day 10](https://adventofcode.com/2024/day/10)
 

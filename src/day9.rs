@@ -56,7 +56,7 @@ pub fn solve_part_one(input: &str) -> AoCResult {
 pub fn solve_part_two(input: &str) -> AoCResult {
     let (vals, mut mem) = parse_input(input);
     let mut moved = vals.clone();
-    let initial_offsets = moved
+    let offsets_from = vals
         .iter()
         .scan(0, |state, &x| {
             let res = *state;
@@ -65,20 +65,28 @@ pub fn solve_part_two(input: &str) -> AoCResult {
         })
         .collect::<Vec<_>>();
 
+    let mut offsets_to = offsets_from.clone();
+    let mut min_need_offsets = vec![1; 10];
+
     // Move each value starting from the end
     for from in (0..vals.len()).step_by(2).rev() {
         let need = vals[from];
-        let offset_from = initial_offsets[from];
-        let mut offset_to = 0;
+        let offset_from = offsets_from[from];
         // Find space for it starting from the start
-        for to in (1..from).step_by(2) {
-            offset_to += moved[to - 1];
+        for to in (min_need_offsets[need as usize]..from).step_by(2) {
             if moved[to] >= need {
+                let offset_to = offsets_to[to];
                 // Found space, move. Update from, to and free space around each one
                 moved[from] -= need;
                 moved[from - 1] += need;
                 moved[to] -= need;
                 moved[to - 1] += need;
+                offsets_to[to] += need;
+
+                // Update min idx offsets for bigger values of need
+                for i in need as usize..min_need_offsets.len() {
+                    min_need_offsets[i] = min_need_offsets[i].max(to);
+                }
 
                 // Relocate mem
                 for idx in 0..need {
@@ -87,7 +95,6 @@ pub fn solve_part_two(input: &str) -> AoCResult {
                 }
                 break;
             }
-            offset_to += moved[to];
         }
     }
 
